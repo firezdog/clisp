@@ -1,1 +1,1 @@
-# clisp
+This repository contains code and exercises meant to build towards a LISP interpreter written in C.
