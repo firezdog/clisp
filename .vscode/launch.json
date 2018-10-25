@@ -5,9 +5,10 @@
     "version": "0.2.0",
     "configurations": [
         {
-            "name": "(lldb) Launch",
+            "name": "C Launch (Mac)",
             "type": "cppdbg",
             "request": "launch",
+            //points to a.out, which will be synced to program you want to debug after running task (command-shift-b)
             "program": "${workspaceFolder}/a.out",
             "args": [],
             "stopAtEntry": false,
@@ -17,9 +18,10 @@
             "MIMode": "lldb"
         },
         {
-            "name": "C Launch",
+            "name": "C Launch (PC)",
             "type": "cppdbg",
             "request": "launch",
+            //points to program you want to debug
             "program": "/mnt/c/Users/firez/Documents/C_Lisp/hello_world/a.out",
             "args": [],
             "stopAtEntry": false,

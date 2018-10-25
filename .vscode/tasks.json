@@ -1,8 +1,10 @@
 {
     // See https://go.microsoft.com/fwlink/?LinkId=733558
     // for the documentation about the tasks.json format
+    // args should point to file you want to debug
+
     "version": "2.0.0",
-    "command": "clang",
+    "command": "clang (Mac)",
     "type": "shell",
     "args": ["hello_world/hello.c", "-g"],
     "presentation": {
