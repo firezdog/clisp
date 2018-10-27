@@ -7,7 +7,7 @@ static char input[2048];
 int main(int argc, char** argv) {
     
     //Info
-    puts("Lispy Version 1");
+    puts("Lispy Version 1.0");
     puts("Press Ctrl + c to exit");
 
     while (1) {
