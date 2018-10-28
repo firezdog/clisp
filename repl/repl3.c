@@ -1,10 +1,10 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-#ifdef _WIN32
+#if defined(__CYGWIN__) | defined(_WIN32)
 #include <string.h>
 
-static char buffer[2048]
+static char buffer[2048];
 
 /* Fake readline function -- displays a prompt (passed), gets user input, stores it in a buffer, copies contents of the buffer, and returns */
 char* readline(char* prompt) {
@@ -28,6 +28,8 @@ void add_history(char* unused) {}
 #include <editline/history.h>
 #include <editline/readline.h>
 
+#endif
+
 int main(int argc, char** argv) {
 
     puts("Lispy Version 1.2");
@@ -47,5 +49,3 @@ int main(int argc, char** argv) {
     return 0;
 
 }
-
-#endif
