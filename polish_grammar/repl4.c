@@ -41,25 +41,32 @@ int main(int argc, char** argv) {
 
     //define grammar for parsers
     mpca_lang(MPCA_LANG_DEFAULT,
-    "numeral: /-?[0-9]+/    ; \
-    operator: '+' | '-' | '*' | '/' ; \
-    expr: <numeral> | '(' <operator> <expr>+ ')' \
-    lispy: /^/ <operator> <expr>+ /$/",
+    "numeral: /-?[0-9]+/ ;\
+    operator: '+' | '-' | '*' | '/' ;\
+    expr: <numeral> | '(' <operator> <expr>+ ')' ;\
+    lispy: /^/ <operator> <expr>+ /$/ ;",
     Numeral, Operator, Expr, Lispy);
 
     //system info
-    puts("Lispy Version 1.2");
+    puts("Lispy Version 4");
     puts("Press Ctrl+c to Exit\n");
 
     while (1) {
 
-        /* readline and add_history defined whether in windows or not */
         //prompt for input and echo
         char* input = readline("lispy> ");
         add_history(input);
 
-        //TODO: this should parse
-        printf("echo %s\n", input);
+        //now we echo the grammar
+        //used for parsing
+        mpc_result_t r;    
+        if (mpc_parse("<stdin>", input, Lispy, &r)) {
+            mpc_ast_print(r.output);
+            mpc_ast_delete(r.output);
+        } else {
+            mpc_err_print(r.output);
+            mpc_err_delete(r.output);
+        }
         free(input);
 
     }
