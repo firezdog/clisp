@@ -26,8 +26,23 @@ The other improvement: using "\d" is more concise than using "[0-9]".
 4. Edge case: Decimals without left integer will pass (.234, -.234)
 5. Edge case: integers with period will not pass (234., -234.)
 
-Surprise: C regex does not allow the "d" pattern (or the \. escape)!
+###Surprise 
+
+C regex does not allow the "d" pattern (or the \. escape? -- see below)!
 
 We replace it with:
 
-> ([0-9]*.)?[0-9]+
+> ([0-9]*.)?[0-9]+ (this is wrong -- see below)
+
+...No.  We need to escape that "." or it means "any single character".  How to escape?  Actually, you need to use two '\' -- so you get this:
+
+> ([0-9]*\\.)?[0-9]+
+
+A resource that explains this (sort of):
+
+http://www.informit.com/articles/article.aspx?p=2064649&seqNum=2
+
+Seems like it is because I'm doing this in the context of a "string literal."
+
+## Necessary?
+Seems like the program and expression definition are repeating each other?

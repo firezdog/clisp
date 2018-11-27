@@ -42,7 +42,7 @@ int main(int argc, char** argv) {
     //define grammar for parsers
     mpca_lang(MPCA_LANG_DEFAULT,
     //add support for decimals (ex 1)
-    "numeral: /-?([0-9]*.)?[0-9]+/ ;\
+    "numeral: /-?([0-9]*\\.)?[0-9]+/ ;\
     operator: '+' | '-' | '*' | '/' ;\
     expr: <numeral> | '(' <operator> <expr>+ ')' ;\
     lispy: /^/ <operator> <expr>+ /$/ ;",
