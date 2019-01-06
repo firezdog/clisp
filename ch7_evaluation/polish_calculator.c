@@ -31,25 +31,13 @@ void add_history(char* unused) {}
 
 #endif
 
-void print_info(mpc_ast_t* t) {
-    printf("Tag: %s\n", t->tag);
-    printf("Contents: %s\n", t->contents);
-    printf("Number of children: %i\n", t->children_num);
-    printf("=============================\n");
-}
-
-int count_nodes(mpc_ast_t* t) {
-    if (t->children_num == 0) {
-        print_info(t);
-        return 1; 
-    }
-    else {
-        int total = 1;
+void evaluate(mpc_ast_t* t) {
+    if (strstr(t->tag, "numeral") != 0) {
+        printf("%s\n", t->contents);
+    } else {
         for (int i = 0; i < t->children_num; i++) {
-            print_info(t->children[i]);
-            total += count_nodes(t->children[i]);
+            evaluate(t->children[i]);
         }
-        return total;
     }
 }
 
@@ -74,7 +62,6 @@ int main(int argc, char** argv) {
     puts("Press Ctrl+c to Exit\n");
 
     while (1) {
-
         // prompt for input and echo
         char* input = readline("lispy> ");
         add_history(input);
@@ -85,14 +72,13 @@ int main(int argc, char** argv) {
         if (mpc_parse("<stdin>", input, Lispy, &r)) {
             // Load AST from output
             mpc_ast_t* a = r.output;
-            printf("Total number of nodes: %i\n", count_nodes(a));
+            evaluate(a);
             mpc_ast_delete(r.output);
         } else {
             mpc_err_print(r.output);
             mpc_err_delete(r.output);
         }
         free(input);
-
     }
 
     // clean up
