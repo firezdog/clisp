@@ -31,12 +31,14 @@ void add_history(char* unused) {}
 
 #endif
 
-void evaluate(mpc_ast_t* t) {
+int evaluate(mpc_ast_t* t) {
     if (strstr(t->tag, "numeral") != 0) {
-        printf("%s\n", t->contents);
+        return atoi(t->contents);
     } else {
         for (int i = 0; i < t->children_num; i++) {
-            evaluate(t->children[i]);
+            if (strcmp(t->children[i]->contents,"+")) {
+                return atoi(t->children[i+2]->contents) + evaluate(t->children[i+3]);                
+            }
         }
     }
 }
@@ -72,7 +74,7 @@ int main(int argc, char** argv) {
         if (mpc_parse("<stdin>", input, Lispy, &r)) {
             // Load AST from output
             mpc_ast_t* a = r.output;
-            evaluate(a);
+            printf("%i\n", evaluate(a));
             mpc_ast_delete(r.output);
         } else {
             mpc_err_print(r.output);
