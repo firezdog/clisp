@@ -35,9 +35,16 @@ int evaluate(mpc_ast_t* t) {
     if (strstr(t->tag, "numeral") != 0) {
         return atoi(t->contents);
     } else {
+        // seems like the loops is needed here when working your way in to terms on the right.  Perhaps the loop could be replaced with an if check.
         for (int i = 0; i < t->children_num; i++) {
-            if (strcmp(t->children[i]->contents,"+")) {
-                return atoi(t->children[i+2]->contents) + evaluate(t->children[i+3]);                
+            if (strcmp(t->children[i]->contents,"+") == 0) {
+                return atoi(t->children[i+1]->contents) + evaluate(t->children[i+2]);
+            } else if (strcmp(t->children[i]->contents, "-") == 0) {
+                return atoi(t->children[i+1]->contents) - evaluate(t->children[i+2]);
+            } else if (strcmp(t->children[i]->contents, "*") == 0) {
+                return atoi(t->children[i+1]->contents) * evaluate(t->children[i+2]);
+            } else if (strcmp(t->children[i]->contents, "/") == 0) {
+                return atoi(t->children[i+1]->contents) / evaluate(t->children[i+2]);
             }
         }
     }
