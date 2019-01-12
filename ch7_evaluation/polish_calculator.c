@@ -36,15 +36,18 @@ int evaluate(mpc_ast_t* t) {
         return atoi(t->contents);
     } else {
         // seems like the loops is needed here when working your way in to terms on the right.  Perhaps the loop could be replaced with an if check.
+        // you need to evaluate both the left and the right terms :p
+        // Operations must be flanked by two terms -- I consider operations flanked by more than two terms to yield ill-formed expressions.
+        // Note that this just drills down whatever the first correctly formed expression is and evaluates that.  "- (+ 3 5)" is technically not a complete expression, though it is well-formed (according to the syntactical rules); intuitively it would evaluate to -8 but it in fact evaluates to 8 -- the incomplete expression apparently never gets evaluated... (actually, intuition might not be correct -- this might be treated as "- (+ 3 5) 0")
         for (int i = 0; i < t->children_num; i++) {
             if (strcmp(t->children[i]->contents,"+") == 0) {
-                return atoi(t->children[i+1]->contents) + evaluate(t->children[i+2]);
+                return evaluate(t->children[i+1]) + evaluate(t->children[i+2]);
             } else if (strcmp(t->children[i]->contents, "-") == 0) {
-                return atoi(t->children[i+1]->contents) - evaluate(t->children[i+2]);
+                return evaluate(t->children[i+1]) - evaluate(t->children[i+2]);
             } else if (strcmp(t->children[i]->contents, "*") == 0) {
-                return atoi(t->children[i+1]->contents) * evaluate(t->children[i+2]);
+                return evaluate(t->children[i+1]) * evaluate(t->children[i+2]);
             } else if (strcmp(t->children[i]->contents, "/") == 0) {
-                return atoi(t->children[i+1]->contents) / evaluate(t->children[i+2]);
+                return evaluate(t->children[i+1]) / evaluate(t->children[i+2]);
             }
         }
     }
