@@ -31,26 +31,35 @@ void add_history(char* unused) {}
 
 #endif
 
+int eval_op(int a, char* op, int b) {
+    // using ! for falsy 0 (unintitive and prob less legible but more concise)
+    if (!strcmp(op, "+")) { return a + b; }
+    if (!strcmp(op, "-")) { return a - b; }
+    if (!strcmp(op, "*")) { return a * b; }
+    // c language doesn't have exceptions, so I don't know how to handle case where b is 0
+    if (!strcmp(op, "/")) { return a / b; }    
+}
+
 int evaluate(mpc_ast_t* t) {
-    if (strstr(t->tag, "numeral") != 0) {
+    // apparently 0 is also "falsy" in C?
+    if (strstr(t->tag, "numeral")) {
         return atoi(t->contents);
-    } else {
-        // seems like the loops is needed here when working your way in to terms on the right.  Perhaps the loop could be replaced with an if check.
-        // you need to evaluate both the left and the right terms :p
-        // Operations must be flanked by two terms -- I consider operations flanked by more than two terms to yield ill-formed expressions.
-        // Note that this just drills down whatever the first correctly formed expression is and evaluates that.  "- (+ 3 5)" is technically not a complete expression, though it is well-formed (according to the syntactical rules); intuitively it would evaluate to -8 but it in fact evaluates to 8 -- the incomplete expression apparently never gets evaluated... (actually, intuition might not be correct -- this might be treated as "- (+ 3 5) 0")
-        for (int i = 0; i < t->children_num; i++) {
-            if (strcmp(t->children[i]->contents,"+") == 0) {
-                return evaluate(t->children[i+1]) + evaluate(t->children[i+2]);
-            } else if (strcmp(t->children[i]->contents, "-") == 0) {
-                return evaluate(t->children[i+1]) - evaluate(t->children[i+2]);
-            } else if (strcmp(t->children[i]->contents, "*") == 0) {
-                return evaluate(t->children[i+1]) * evaluate(t->children[i+2]);
-            } else if (strcmp(t->children[i]->contents, "/") == 0) {
-                return evaluate(t->children[i+1]) / evaluate(t->children[i+2]);
-            }
-        }
+    } // else un-necessary b/c of return statement above
+    
+    /* first node is an expr? -- 2nd child of expr is always op */
+    char* op = t->children[1]->contents;
+
+    /* left expression */
+    int x = evaluate(t->children[2]);
+
+    /* go until you reach ')'?  -- I just don't find this intuitive -- I guess it allows for any number of arguments to flank an operator */
+    int i = 3;
+    while (strstr(t->children[i]->tag, "expr")) {
+        x = eval_op(x, op, evaluate(t->children[i]));
+        i++;
     }
+
+    return x;
 }
 
 int main(int argc, char** argv) {
