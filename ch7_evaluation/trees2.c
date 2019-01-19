@@ -35,7 +35,7 @@ int countBranches(tree* t) {
     if (branches == 0) { return branches; }
     for (int i = 0; i < branches; i++) {
         printf("counting branches\n");
-        branches += countBranches(t->children[i]);
+        if (t->children[i]) { branches += countBranches(t->children[i]); }
     }
     return branches;
 }
@@ -43,6 +43,13 @@ int countBranches(tree* t) {
 int main() {
     tree* t = createTree(5);
     addBranch(t,10);
+    addBranch(t,10);
+    addBranch(t,10);
+    addBranch(t,10);
+    addBranch(t,10);
+    addBranch(t->children[0],10);
+    addBranch(t->children[0],10);
+    addBranch(t->children[0],10);
     addBranch(t->children[0],10);
     printf("%i\n", countBranches(t));
     return 0;
