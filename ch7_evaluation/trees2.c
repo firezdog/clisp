@@ -32,9 +32,7 @@ void addBranch(tree* t, int data) {
 
 int countBranches(tree* t) {
     int branches = t->num_children;
-    if (branches == 0) { return branches; }
     for (int i = 0; i < branches; i++) {
-        printf("counting branches\n");
         if (t->children[i]) { branches += countBranches(t->children[i]); }
     }
     return branches;
