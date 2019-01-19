@@ -55,12 +55,13 @@ int main() {
     // for some reason, adding another branch crashes it?
     // some kind of memory allocation problem -- see above for hack fix.
     // must be because I need to allocate memory not just for number of children, but children of children also!
+    // but there's only an issue when I count the number of trees? -- how is that malloc?
     addBranch(t->children[1],10);
     addBranch(t->children[1],10);
     addBranch(t->children[1],10);
     addBranch(t->children[1],10);
     addBranch(t->children[1],10);
 
-    printf("%i\n", countBranches(t));
+    // printf("%i\n", countBranches(t));
     return 0;
 }
