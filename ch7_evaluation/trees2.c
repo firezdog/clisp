@@ -49,6 +49,11 @@ int main() {
     addBranch(t->children[0],10);
     addBranch(t->children[0],10);
     addBranch(t->children[0],10);
+    addBranch(t->children[1],10);
+    addBranch(t->children[1],10);
+    addBranch(t->children[1],10);
+    addBranch(t->children[1],10);
+
     printf("%i\n", countBranches(t));
     return 0;
 }
