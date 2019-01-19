@@ -36,6 +36,13 @@ n_ary* create_n_ary(int data, int num_children) {
     return new_n_ary;
 }
 
+void create_some_binary_nodes() {
+    node* root = create_node(1);
+    root->left = create_node(2);
+    root->left->left = create_node(3);
+    printf("%i, %i, %i", root->data, root->left->data, root->left->left->data);
+}
+
 int main() {
     printf("Making head for n-ary tree.\n");
     n_ary* t = create_n_ary(5, 10);
@@ -43,11 +50,4 @@ int main() {
     for (int i = 0; i < t->num_children; i++) {
         printf("Child %i has %i children.\n", i+1, t->children[i]->num_children);
     }
-}
-
-void create_some_binary_nodes() {
-    node* root = create_node(1);
-    root->left = create_node(2);
-    root->left->left = create_node(3);
-    printf("%i, %i, %i", root->data, root->left->data, root->left->left->data);
 }
