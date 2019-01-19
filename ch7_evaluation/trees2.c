@@ -19,23 +19,23 @@ tree* createTree(int data) {
     return t;
 }
 
-void addBranch(tree* t, int data) {
-    int children = t->num_children;
-    tree **temp = t->children;
-    t->children = malloc((children+1) * sizeof(tree));
-    for (int i = 0; i < children; i++) {
-        t->children[i] = temp[i];
-    }
-    t->children[children] = createTree(data);
-    t->num_children++;
-}
-
 int countBranches(tree* t) {
     int branches = t->num_children;
     for (int i = 0; i < branches; i++) {
         if (t->children[i]) { branches += countBranches(t->children[i]); }
     }
     return branches;
+}
+
+void addBranch(tree* t, int data) {
+    int children = t->num_children;
+    tree **temp = t->children;
+    t->children = malloc(100 * sizeof(tree));
+    for (int i = 0; i < children; i++) {
+        t->children[i] = temp[i];
+    }
+    t->children[children] = createTree(data);
+    t->num_children++;
 }
 
 int main() {
@@ -49,6 +49,13 @@ int main() {
     addBranch(t->children[0],10);
     addBranch(t->children[0],10);
     addBranch(t->children[0],10);
+
+    addBranch(t->children[1],10);
+    addBranch(t->children[1],10);
+    // for some reason, adding another branch crashes it?
+    // some kind of memory allocation problem -- see above for hack fix.
+    // must be because I need to allocate memory not just for number of children, but children of children also!
+    addBranch(t->children[1],10);
     addBranch(t->children[1],10);
     addBranch(t->children[1],10);
     addBranch(t->children[1],10);
