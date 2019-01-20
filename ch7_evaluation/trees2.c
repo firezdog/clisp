@@ -31,6 +31,12 @@ void addBranch(tree* t, int data) {
     t->num_children++;
 }
 
+void addBranches(tree* t, int data[], int size) {
+    for (int i = 0; i < size; i++) {
+        addBranch(t, data[i]);
+    }
+}
+
 int countBranches(tree* t) {
     int branches = t->num_children;
     for (int i = 0; i < t->num_children; i++) {
@@ -48,13 +54,23 @@ int countLeaves(tree* t) {
     return leaves;
 }
 
+// find the maximum number of children spanning one branch
+// does this mean find the node with the most children?
+int maxSpan(int max, tree* t) {
+    if (max < t->num_children) { max = t->num_children; }
+    if (!t->num_children) { return max; }
+    for (int i = 0; i < t->num_children; i++) {
+        max = maxSpan(max, t->children[i]);
+    }
+    return max;
+}
+
 int main() {
     tree* t = createTree(0);
-    addBranch(t, 0);
-    addBranch(t, 0);
-    addBranch(t, 0);
-    addBranch(t->children[0], 0);
-    addBranch(t->children[0], 0);
-    printf("%i\n", countLeaves(t));
+    int arr[] = {1,2,3,4,5,6};
+    int arr2[] = {1,2,3,4,5,6,7,8,9,10};
+    addBranches(t, arr, sizeof(arr)/sizeof(arr[0]));
+    addBranches(t->children[5], arr2, sizeof(arr2)/sizeof(arr2[0]));
+    printf("%i\n", maxSpan(0,t));
     return 0;
 }
