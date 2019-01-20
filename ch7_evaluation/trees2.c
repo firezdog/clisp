@@ -16,13 +16,14 @@ tree* createTree(int data) {
     tree* t = malloc(sizeof(tree));
     t->num_children = 0;
     t->data = data;
+    t->children = NULL;
     return t;
 }
 
 int countBranches(tree* t) {
     int branches = t->num_children;
-    for (int i = 0; i < branches; i++) {
-        if (t->children[i]) { branches += countBranches(t->children[i]); }
+    for (int i = 0; i < t->num_children; i++) {
+        branches += countBranches(t->children[i]);
     }
     return branches;
 }
@@ -30,7 +31,7 @@ int countBranches(tree* t) {
 void addBranch(tree* t, int data) {
     int children = t->num_children;
     tree **temp = t->children;
-    t->children = malloc(100 * sizeof(tree));
+    t->children = malloc((children + 1) * sizeof(tree));
     for (int i = 0; i < children; i++) {
         t->children[i] = temp[i];
     }
@@ -56,12 +57,24 @@ int main() {
     // some kind of memory allocation problem -- see above for hack fix.
     // must be because I need to allocate memory not just for number of children, but children of children also!
     // but there's only an issue when I count the number of trees? -- how is that malloc?
+
+    // UPDATE (1/20 12:37pm) -- nope -- it was because I was (I hope) changing the value of the iterator! *rolls eyes*
+    addBranch(t->children[1],10);
+    addBranch(t->children[1],10);
+    addBranch(t->children[1],10);
+    addBranch(t->children[1],10);
+    addBranch(t->children[1],10);
+    addBranch(t->children[1],10);
+    addBranch(t->children[1],10);
+    addBranch(t->children[1],10);
+    addBranch(t->children[1],10);
+    addBranch(t->children[1],10);
     addBranch(t->children[1],10);
     addBranch(t->children[1],10);
     addBranch(t->children[1],10);
     addBranch(t->children[1],10);
     addBranch(t->children[1],10);
 
-    // printf("%i\n", countBranches(t));
+    printf("%i\n", countBranches(t));
     return 0;
 }
