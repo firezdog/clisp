@@ -26,31 +26,45 @@ void add_history(char* unused) {}
 
 #else
 // compile with flag "-ledit"
-// #include <editline/history.h> // not needed in MacOS X
+// #include <editline/history.h> // not needed in OSX
 #include <editline/readline.h>
 
 #endif
 
-void print_info(mpc_ast_t* t) {
-    printf("Tag: %s\n", t->tag);
-    printf("Contents: %s\n", t->contents);
-    printf("Number of children: %i\n", t->children_num);
-    printf("=============================\n");
+int eval_op(int a, char* op, int b) {
+    // using ! for falsy 0 (unintitive and prob less legible but more concise)
+    if (!strcmp(op, "+")) { return a + b; }
+    if (!strcmp(op, "-")) { return a - b; }
+    if (!strcmp(op, "*")) { return a * b; }
+    // c language doesn't have exceptions, so I don't know how to handle case where b is 0
+    if (!strcmp(op, "/")) { return a / b; }
+    if (!strcmp(op, "%")) { return a % b; }
+    if (!strcmp(op, "^")) { return pow(a,b); }
+    if (!strcmp(op, "min")) { return a <= b ? a : b; }
+    if (!strcmp(op, "max")) { return a >= b ? a : b; }
+    return 0;
 }
 
-int count_nodes(mpc_ast_t* t) {
-    if (t->children_num == 0) {
-        print_info(t);
-        return 1; 
+int evaluate(mpc_ast_t* t) {
+    // apparently 0 is also "falsy" in C?
+    if (strstr(t->tag, "numeral")) {
+        return atoi(t->contents);
+    } // else un-necessary b/c of return statement above
+    
+    /* first node is an expr? -- 2nd child of expr is always op */
+    char* op = t->children[1]->contents;
+
+    /* left expression */
+    int x = evaluate(t->children[2]);
+
+    /* go until you reach ')'?  -- I just don't find this intuitive -- I guess it allows for any number of arguments to flank an operator */
+    int i = 3;
+    while (strstr(t->children[i]->tag, "expr")) {
+        x = eval_op(x, op, evaluate(t->children[i]));
+        i++;
     }
-    else {
-        int total = 1;
-        for (int i = 0; i < t->children_num; i++) {
-            print_info(t->children[i]);
-            total += count_nodes(t->children[i]);
-        }
-        return total;
-    }
+
+    return i == 3 && !strcmp(op, "-") ? -x : x;
 }
 
 int main(int argc, char** argv) {
@@ -64,7 +78,7 @@ int main(int argc, char** argv) {
     // define grammar for parsers
     mpca_lang(MPCA_LANG_DEFAULT,
     "numeral: /-?[0-9]+/ ;\
-    operator: '+' | '-' | '*' | '/' ;\
+    operator: '+' | '-' | '*' | '/' | '%' | '^' | \"min\" | \"max\" ;\
     expr: <numeral> | '(' <operator> <expr>+ ')' ;\
     lispy: /^/ <operator> <expr>+ /$/ ;",
     Numeral, Operator, Expr, Lispy);
@@ -74,7 +88,6 @@ int main(int argc, char** argv) {
     puts("Press Ctrl+c to Exit\n");
 
     while (1) {
-
         // prompt for input and echo
         char* input = readline("lispy> ");
         add_history(input);
@@ -85,14 +98,13 @@ int main(int argc, char** argv) {
         if (mpc_parse("<stdin>", input, Lispy, &r)) {
             // Load AST from output
             mpc_ast_t* a = r.output;
-            printf("Total number of nodes: %i\n", count_nodes(a));
+            printf("%i\n", evaluate(a));
             mpc_ast_delete(r.output);
         } else {
             mpc_err_print(r.output);
             mpc_err_delete(r.output);
         }
         free(input);
-
     }
 
     // clean up

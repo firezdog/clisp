@@ -26,7 +26,7 @@ void add_history(char* unused) {}
 
 #else
 // compile with flag "-ledit"
-#include <editline/history.h>
+// #include <editline/history.h> // not needed in OSX
 #include <editline/readline.h>
 
 #endif
@@ -37,7 +37,7 @@ int eval_op(int a, char* op, int b) {
     if (!strcmp(op, "-")) { return a - b; }
     if (!strcmp(op, "*")) { return a * b; }
     // c language doesn't have exceptions, so I don't know how to handle case where b is 0
-    if (!strcmp(op, "/")) { return a / b; }    
+    if (!strcmp(op, "/")) { return a / b; }
 }
 
 int evaluate(mpc_ast_t* t) {
