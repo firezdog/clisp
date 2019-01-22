@@ -65,27 +65,6 @@ int maxSpan(int max, tree* t) {
     return max;
 }
 
-// this works, but not for the right reasons, e.g. "queue" is not a queue
-// ideally we want to delete get the first item in the queue, delete it, shift left, and add its children, then repeat?
-// void traverse(tree* t) {
-//     int size = countBranches(t) + 1;
-//     tree* queue[size];
-//     queue[0] = t;
-//     int now = 0;
-//     printf("%i ", t->data);
-//     while (queue[0]) {
-//         tree* c = queue[now];
-//         queue[now] = NULL;
-//         for (int i = 0; i < c->num_children; i++) {
-//             queue[now] = c->children[i];
-//             printf("%i ", queue[now]->data);
-//             now++;
-//         }
-//         now--;
-//     }
-//     printf("\n");
-// }
-
 void traverse(tree* t) {
     int size = countBranches(t) + 1;
     tree* queue[size];
