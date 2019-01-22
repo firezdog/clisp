@@ -65,12 +65,35 @@ int maxSpan(int max, tree* t) {
     return max;
 }
 
+void traverse(tree* t) {
+    int size = countBranches(t) + 1;
+    tree* queue[size];
+    queue[0] = t;
+    int now = 0;
+    printf("%i ", t->data);
+    while (queue[0]) {
+        tree* t = queue[now];
+        queue[now] = NULL;
+        for (int i = 0; i < t->num_children; i++) {
+            queue[now] = t->children[i];
+            printf("%i ", queue[now]->data);
+            now++;
+        }
+        now--;
+    }
+    printf("\n");
+}
+
 int main() {
     tree* t = createTree(0);
     int arr[] = {1,2,3,4,5,6};
-    int arr2[] = {1,2,3,4,5,6,7,8,9,10};
+    int arr2[] = {11,12,13,14,15,16,17,18,19,20};
+    int arr3[] = {100, 101, 102, 103, 104, 105, 106};
     addBranches(t, arr, sizeof(arr)/sizeof(arr[0]));
-    addBranches(t->children[5], arr2, sizeof(arr2)/sizeof(arr2[0]));
-    printf("%i\n", maxSpan(0,t));
+    addBranches(t->children[0], arr2, sizeof(arr2)/sizeof(arr2[0]));
+    addBranches(t->children[1], arr2, sizeof(arr2)/sizeof(arr2[0]));
+    addBranches(t->children[0]->children[0], arr3, sizeof(arr3)/sizeof(arr3[0]));
+    addBranches(t->children[0]->children[1], arr3, sizeof(arr3)/sizeof(arr3[0]));
+    traverse(t);
     return 0;
 }
