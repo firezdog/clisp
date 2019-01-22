@@ -74,10 +74,10 @@ void traverse(tree* t) {
     int now = 0;
     printf("%i ", t->data);
     while (queue[0]) {
-        tree* t = queue[now];
+        tree* c = queue[now];
         queue[now] = NULL;
-        for (int i = 0; i < t->num_children; i++) {
-            queue[now] = t->children[i];
+        for (int i = 0; i < c->num_children; i++) {
+            queue[now] = c->children[i];
             printf("%i ", queue[now]->data);
             now++;
         }
