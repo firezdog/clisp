@@ -65,6 +65,8 @@ int maxSpan(int max, tree* t) {
     return max;
 }
 
+// this works, but not for the right reasons, e.g. "queue" is not a queue, "t" is defined twice, etc.
+// ideally we want to delete get the first item in the queue, delete it, shift left, and add its children, then repeat?
 void traverse(tree* t) {
     int size = countBranches(t) + 1;
     tree* queue[size];
