@@ -28,7 +28,7 @@ void add_history(char* unused) {}
 
 #else
 // compile with flag "-ledit"
-#include <editline/history.h>
+// #include <editline/history.h>
 #include <editline/readline.h>
 
 #endif

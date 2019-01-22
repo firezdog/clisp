@@ -67,35 +67,56 @@ int maxSpan(int max, tree* t) {
 
 // this works, but not for the right reasons, e.g. "queue" is not a queue
 // ideally we want to delete get the first item in the queue, delete it, shift left, and add its children, then repeat?
+// void traverse(tree* t) {
+//     int size = countBranches(t) + 1;
+//     tree* queue[size];
+//     queue[0] = t;
+//     int now = 0;
+//     printf("%i ", t->data);
+//     while (queue[0]) {
+//         tree* c = queue[now];
+//         queue[now] = NULL;
+//         for (int i = 0; i < c->num_children; i++) {
+//             queue[now] = c->children[i];
+//             printf("%i ", queue[now]->data);
+//             now++;
+//         }
+//         now--;
+//     }
+//     printf("\n");
+// }
+
 void traverse(tree* t) {
     int size = countBranches(t) + 1;
     tree* queue[size];
-    queue[0] = t;
-    int now = 0;
-    printf("%i ", t->data);
-    while (queue[0]) {
-        tree* c = queue[now];
-        queue[now] = NULL;
-        for (int i = 0; i < c->num_children; i++) {
-            queue[now] = c->children[i];
-            printf("%i ", queue[now]->data);
-            now++;
-        }
-        now--;
+    for (int i = 0; i < size; i++) {
+        queue[i] = NULL;
     }
-    printf("\n");
+    queue[0] = t;
+    while (queue[0]) {
+        tree* current = queue[0];
+        printf("%i\n", current->data);
+        queue[0] = NULL;
+        for (int i = 0; i < size-1; i++) {
+            queue[i] = queue[i+1];
+        }
+        int j = 0;
+        while (queue[j]) { j++; }
+        for (int i = 0; i < current->num_children; i++) {
+            queue[j] = current->children[i];
+            j++;
+        }
+    }
 }
 
 int main() {
     tree* t = createTree(0);
-    int arr[] = {1,2,3,4,5,6};
-    int arr2[] = {11,12,13,14,15,16,17,18,19,20};
-    int arr3[] = {100, 101, 102, 103, 104, 105, 106};
-    addBranches(t, arr, sizeof(arr)/sizeof(arr[0]));
-    addBranches(t->children[0], arr2, sizeof(arr2)/sizeof(arr2[0]));
-    addBranches(t->children[1], arr2, sizeof(arr2)/sizeof(arr2[0]));
-    addBranches(t->children[0]->children[0], arr3, sizeof(arr3)/sizeof(arr3[0]));
-    addBranches(t->children[0]->children[1], arr3, sizeof(arr3)/sizeof(arr3[0]));
+    int arr[] = {1, 2, 3, 4, 5};
+    int arr2[] = {11, 12, 13, 14, 15};
+    int arr3[] = {101, 102, 103, 104, 105};
+    addBranches(t, arr, 5);
+    addBranches(t->children[4], arr2, 5);
+    addBranches(t->children[4]->children[4], arr3, 5);
     traverse(t);
     return 0;
 }
