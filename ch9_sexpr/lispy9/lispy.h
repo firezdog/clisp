@@ -31,8 +31,7 @@ lval* lval_read(mpc_ast_t* t);
 #pragma endregion
 
 #pragma region evaluation
-// lval evaluate(mpc_ast_t* t);
-// lval eval_op(lval a, char* op, lval b);
+lval* lval_eval_sexpr(lval* v);
 #pragma endregion
 
 #pragma region grammar
