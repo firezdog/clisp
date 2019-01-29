@@ -57,6 +57,7 @@ int main(int argc, char** argv) {
             // Load AST from output
             mpc_ast_t* a = r.output;
             lval* result = lval_read(r.output);
+            result = lval_eval(result);
             lval_println(result);
             lval_del(result);
             mpc_ast_delete(r.output);
