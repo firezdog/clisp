@@ -8,14 +8,14 @@ enum { LVAL_NUM, LVAL_ERR, LVAL_OP, LVAL_SEXPR, LERR_NUM, LERR_OP, LERR_DIV_ZERO
 
 typedef struct lval {
     int type;
-    int num;
+    double num;
     char* err;
     char* op;
     struct lval** cell;
     int cell_count;
 } lval;
 
-lval* lval_num(int x);
+lval* lval_num(double x);
 lval* lval_err(char* mesage);
 lval* lval_op(char* op);
 lval* lval_sexpr();
@@ -36,6 +36,7 @@ lval* lval_eval(lval* v);
 lval* lval_take(lval* v, int i);
 lval* lval_pop(lval* v, int i);
 lval* builtin_op(lval* a, char* op);
+int check_div_0(double x);
 #pragma endregion
 
 #pragma region grammar

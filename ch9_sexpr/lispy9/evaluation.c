@@ -76,14 +76,20 @@ lval* builtin_op(lval* a, char* op) {
         if (!strcmp(op, "-")) { result->num -= y->num; }
         // But if we have a 0 for division, delete pops and arguments, return error.'
         if (!strcmp(op, "/")) {
-            if (y->num == 0) { 
-                lval_del(result); lval_del(y);
-                return lval_err("Division by zero."); 
-            } 
+            if (check_div_0(y->num)) { return lval_err("Division by zero."); }
             result->num /= y->num;
+        }
+        // or modulus
+        if (!strcmp(op, "%")) {
+            if (check_div_0(y->num)) { return lval_err("Division by zero."); }
+            result->num = (int) result->num % (int) y->num;
         }
         // we're done with y
         lval_del(y);
     }
     lval_del(a); return result;
+}
+
+int check_div_0(double x) {
+    return x == 0 ? 1 : 0;
 }

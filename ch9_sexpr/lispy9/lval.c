@@ -2,7 +2,7 @@
 #include "lispy.h"
 
 #pragma region init
-lval* lval_num(int x) {
+lval* lval_num(double x) {
     lval* v = malloc(sizeof(lval));
     v->type = LVAL_NUM;
     v->num = x;
@@ -64,7 +64,7 @@ void lval_del(lval* v) {
 #pragma region print
 void lval_print(lval* v) {
     switch(v->type) {
-        case(LVAL_NUM)  :   printf("%i", v->num);  break;
+        case(LVAL_NUM)  :   printf("%g", v->num);  break;
         case(LVAL_ERR)  :   printf("Error: %s", v->err); break;
         case(LVAL_OP)   :   printf("%s", v->op); break; 
         case(LVAL_SEXPR):   lval_sexpr_print(v, '(', ')'); break; 
@@ -86,7 +86,7 @@ void lval_println(lval* v) { lval_print(v); putchar('\n'); }
 #pragma region read
 lval* lval_read_num(mpc_ast_t* t) {
     errno = 0;
-    int x = strtol(t->contents, NULL, 10);
+    double x = strtold(t->contents, NULL);
     return errno != ERANGE ? 
         lval_num(x) : lval_err("invalid number");
 }
