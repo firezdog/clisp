@@ -81,7 +81,6 @@ void lval_sexpr_print(lval* v, char open, char close) {
 }
 
 void lval_println(lval* v) { lval_print(v); putchar('\n'); }
-
 #pragma endregion
 
 #pragma region read
@@ -112,4 +111,3 @@ lval* lval_read(mpc_ast_t* t) {
     return x;
 }
 #pragma endregion
-

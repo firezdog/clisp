@@ -27,3 +27,21 @@ lval* lval_eval_sexpr(lval* v) {
     lval_del(f);
     return result;
 }
+
+// evaluates the child of an sexpr based on whether or not it itself is an sexpr
+lval* eval(lval* v) {
+    if (v->type == LVAL_SEXPR) { return lval_eval_sexpr(v); }
+    return v;
+}
+
+// take item from cell at index and shift left, returning item
+lval* lval_pop(lval* v, int i) {
+    lval* p = v->cell[i];
+    lval_del(v->cell[i]);
+    for (i; i < v->cell_count-1; i++) {
+        v->cell[i] = v->cell[i+1];
+    }
+}
+
+// take item from cell at index and delete cell, returning item
+lval* lval_take(lval* v, int i);
