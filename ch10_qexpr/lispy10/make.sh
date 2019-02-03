@@ -1,0 +1,1 @@
+cc lispy.c grammar.c evaluation.c lval.c mpc_library/mpc.c -ledit -g
