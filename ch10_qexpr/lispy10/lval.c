@@ -1,6 +1,6 @@
 #include "lispy.h"
 
-#pragma region init
+#pragma region constructors
 lval* lval_num(double x) {
     lval* v = malloc(sizeof(lval));
     v->type = LVAL_NUM;
@@ -32,10 +32,16 @@ lval* lval_sexpr() {
     return v;
 }
 
+lval* lval_qexpr() {
+    lval* v = lval_sexpr();
+    v->type = LVAL_QEXPR;
+    return v;
+}
+
 // add lval* v to lval* x->cell
 lval* lval_add(lval* x, lval* v) {
-    if (x->type != LVAL_SEXPR) { 
-        puts("Tried to add a cell to a non SEXPR"); 
+    if (!(x->type == LVAL_SEXPR || x->type == LVAL_QEXPR)) { 
+        puts("Tried to add a cell to a non SEXPR or QEXPR"); 
         return NULL; 
     }
     x->cell_count++;
@@ -50,14 +56,20 @@ void lval_del(lval* v) {
         case LVAL_ERR: free(v->err); break;
         case LVAL_OP: free(v->op); break;
         case LVAL_SEXPR:
-            for (int i = 0; i < v->cell_count; i++) {
-                lval_del(v->cell[i]);
-            }
-            free(v->cell);
+        case LVAL_QEXPR:
+            delete_cells(v);
             break;
     }
     free(v);
 }
+
+void delete_cells(lval* v) {
+    for (int i = 0; i < v->cell_count; i++) {
+        lval_del(v->cell[i]);
+    }
+    free(v->cell);
+}
+
 #pragma endregion
 
 #pragma region print
@@ -66,7 +78,8 @@ void lval_print(lval* v) {
         case(LVAL_NUM)  :   printf("%g", v->num);  break;
         case(LVAL_ERR)  :   printf("Error: %s", v->err); break;
         case(LVAL_OP)   :   printf("%s", v->op); break; 
-        case(LVAL_SEXPR):   lval_sexpr_print(v, '(', ')'); break; 
+        case(LVAL_SEXPR):   lval_sexpr_print(v, '(', ')'); break;
+        case(LVAL_QEXPR):   lval_sexpr_print(v, '{', '}'); break; 
     }
 }
 
@@ -99,10 +112,13 @@ lval* lval_read(mpc_ast_t* t) {
     lval* x = NULL;
     if (strstr(t->tag, "sexpr") || !strcmp(t->tag, ">")) 
     { x = lval_sexpr(); }
+    if (strstr(t->tag, "qexpr")) { x = lval_qexpr(); }
     for (int i = 0; i < t->children_num; i++) {
         // first, ignore parens and regex
         if (!(strcmp(t->children[i]->contents, "(") &&
             strcmp(t->children[i]->contents, ")") &&
+            strcmp(t->children[i]->contents, "{") &&
+            strcmp(t->children[i]->contents, "}") &&
             strcmp(t->children[i]->tag, "regex")))
             { continue; }
         x = lval_add(x, lval_read(t->children[i]));

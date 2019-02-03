@@ -34,9 +34,15 @@ void add_history(char* unused) {}
 #pragma endregion
 
 #pragma region lval
-enum { LVAL_NUM, LVAL_ERR, LVAL_OP, LVAL_SEXPR, LERR_NUM, LERR_OP, LERR_DIV_ZERO };
-char* input;
-char buffer[2048];
+enum { 
+    LVAL_NUM, 
+    LVAL_ERR, 
+    LVAL_OP, 
+    LVAL_QEXPR,
+    LVAL_SEXPR, 
+    LERR_NUM, 
+    LERR_OP, 
+    LERR_DIV_ZERO };
 
 typedef struct lval {
     int type;
@@ -53,6 +59,7 @@ lval* lval_op(char* op);
 lval* lval_sexpr();
 lval* lval_add(lval* x, lval* v);
 void lval_del(lval* v);
+void delete_cells(lval* v);
 
 void lval_print(lval* v);
 void lval_sexpr_print(lval* v, char open, char close);
@@ -72,6 +79,8 @@ int check_div_0(double x);
 #pragma endregion
 
 #pragma region grammar
+char* input;
+char buffer[2048];
 mpc_parser_t* Numeral;
 mpc_parser_t* Operator;
 mpc_parser_t* Sexpr;
@@ -80,6 +89,7 @@ mpc_parser_t* Expr;
 mpc_parser_t* Lispy;
 void define_grammar(mpc_parser_t* Numeral, mpc_parser_t* Operator, mpc_parser_t* Sexpr, mpc_parser_t* Qexpr, mpc_parser_t* Expr, mpc_parser_t* Lispy);
 mpc_parser_t* init_grammar();
+void parse();
 void cleanup();
 #pragma endregion
 
