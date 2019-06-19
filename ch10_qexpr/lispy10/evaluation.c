@@ -3,6 +3,12 @@
 #define LASSERT(args, cond, err) \
     if(!(cond)) { lval_del(args); return lval_err(err); }
 
+#define BUILTIN_ARG_CHECK(item, num_args, function) \
+    if(!(item->cell_count == num_args)) { lval_del(item); return lval_err(function " only accepts " #num_args " argument(s)"); }
+
+#define BUILTIN_EMPTY_CHECK(item, function) \
+    if(item->cell[0]->cell_count == 0) { lval_del(item); return lval_err(function " does not accept an empty quote."); }
+
 lval* lval_eval_sexpr(lval* v) {
     // evaluate all the children with lval_eval
     for (int i = 0; i < v->cell_count; i++) {
@@ -104,9 +110,9 @@ lval* builtin_op(lval* a, char* op) {
 
 lval* builtin_head(lval* a) {
     /*Check error conditions*/
-    LASSERT(a, a->cell_count == 1, "Function 'head' only accepts one argument.");
+    BUILTIN_ARG_CHECK(a, 1, "head");
     LASSERT(a, a->cell[0]->type == LVAL_QEXPR, "Function 'head' only accepts expressions in curly brackets (q-expressions).");
-    LASSERT(a, a->cell[0]->cell_count != 0, "Function 'head' passed an empty quote, i.e. {}");
+    BUILTIN_EMPTY_CHECK(a, "head");
     lval* v = lval_take(a, 0);
     // repeatedly pop and delete item at v->cell[1] until list only has head.
     while(v->cell_count > 1) {
@@ -117,9 +123,9 @@ lval* builtin_head(lval* a) {
 
 lval* builtin_tail(lval* a) {
     /*Check error conditions*/
-    LASSERT(a, a->cell_count == 1, "Function 'tail' only accepts one argument.");
+    BUILTIN_ARG_CHECK(a, 1, "tail");
     LASSERT(a, a->cell[0]->type == LVAL_QEXPR, "Function 'tail' only accepts expressions in curly brackets (q-expressions).");
-    LASSERT(a, a->cell[0]->cell_count != 0, "Function 'tail' passed an empty quote, i.e. {}");
+    BUILTIN_EMPTY_CHECK(a, "tail");
     // pop the first value off of v.
     lval* v = lval_take(a, 0);
     lval_del(lval_pop(v,0));
@@ -133,7 +139,7 @@ lval* builtin_list(lval* a) {
 }
 
 lval* builtin_eval(lval* a) {
-    LASSERT(a, a->cell_count == 1, "Function 'eval' only accepts one argument.");
+    BUILTIN_ARG_CHECK(a, 1, "eval");
     LASSERT(a, a->cell[0]->type == LVAL_QEXPR, "Function 'eval' only accepts expressions in curly brackets (q-expressions).")
     lval* x = lval_take(a, 0);
     x->type = LVAL_SEXPR;
