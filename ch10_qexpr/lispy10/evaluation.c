@@ -6,6 +6,7 @@
 #define BUILTIN_ARG_CHECK(item, num_args, function) \
     if(!(item->cell_count == num_args)) { lval_del(item); return lval_err(function " only accepts " #num_args " argument(s)"); }
 
+// this could be generalized to a general check that list is of length n
 #define BUILTIN_EMPTY_CHECK(item, function) \
     if(item->cell[0]->cell_count == 0) { lval_del(item); return lval_err(function " does not accept an empty quote."); }
 
@@ -62,6 +63,9 @@ lval* lval_take(lval* v, int i) {
 }
 
 lval* builtin(lval* a, char* func) {
+    if (!strcmp("cons", func)) return builtin_cons(a);
+    if (!strcmp("init", func)) return builtin_init(a);
+    if (!strcmp("len", func)) return builtin_len(a);
     if (!strcmp("head", func)) return builtin_head(a);
     if (!strcmp("tail", func)) return builtin_tail(a);
     if (!strcmp("list", func)) return builtin_list(a);
@@ -108,6 +112,32 @@ lval* builtin_op(lval* a, char* op) {
     lval_del(a); return result;
 }
 
+lval* builtin_cons(lval* a) {
+    BUILTIN_ARG_CHECK(a, 2, "cons");
+    LASSERT(a, a->cell[1]->type == LVAL_QEXPR, "Function 'cons' requires a value followed by an expression in curly brackets (q-expression).");
+    lval* x = lval_qexpr();
+    x = lval_add(x, a->cell[0]);
+    return lval_join(x, a->cell[1]);
+}
+
+lval* builtin_init(lval* a) {
+    /* to return everything but the last, get the length of a, n, pop off n-1, assuming zero indexing, and return.  edge case -- must not be empty -- so that init of a singleton is the empty list. */
+    BUILTIN_ARG_CHECK(a, 1, "init");
+    BUILTIN_EMPTY_CHECK(a, "init");
+    LASSERT(a, a->cell[0]->type == LVAL_QEXPR, "Function 'init' only accepts expressions in curly brackets (q-expressions).");
+    int n = a->cell[0]->cell_count;
+    lval* v = lval_take(a, 0);
+    lval_del(lval_pop(v,n-1));
+    return v;
+}
+
+lval* builtin_len(lval* a) {
+    BUILTIN_ARG_CHECK(a, 1, "len");
+    LASSERT(a, a->cell[0]->type == LVAL_QEXPR, "Function 'len' only accepts expressions in curly brackets (q-expressions).");
+    int n = a->cell[0]->cell_count;
+    return lval_num(n);
+}
+
 lval* builtin_head(lval* a) {
     /*Check error conditions*/
     BUILTIN_ARG_CHECK(a, 1, "head");
@@ -149,7 +179,7 @@ lval* builtin_eval(lval* a) {
 lval* builtin_join(lval* a) {
     for (int i = 0; i < a->cell_count; i++) {
         // (1) are all args QEXPR?
-        LASSERT(a, a->cell[i]->type == LVAL_QEXPR, "Function 'eval' only accepts expressions in curly brackets (q-expressions).")
+        LASSERT(a, a->cell[i]->type == LVAL_QEXPR, "Function 'join' only accepts expressions in curly brackets (q-expressions).")
          // join args one by one using lval_join
     }
     lval* x = lval_pop(a, 0);

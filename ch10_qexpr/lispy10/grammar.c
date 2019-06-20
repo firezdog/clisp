@@ -5,7 +5,8 @@ void define_grammar(mpc_parser_t* Numeral, mpc_parser_t* Operator, mpc_parser_t*
     "numeral: /-?([0-9]*\\.)?[0-9]+/ ;\
     operator:   \
                 \"list\" | \"head\" | \"tail\" | \
-                \"join\" | \"eval\" | \
+                \"join\" | \"eval\" | \"len\" | \
+                \"init\" | \"cons\" | \
                 '+' | '-' | '*' | '/' | '%' ;\
     sexpr: '(' <expr>* ')' ;\
     qexpr: '{' <expr>* '}' ;\
