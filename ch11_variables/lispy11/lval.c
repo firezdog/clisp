@@ -1,5 +1,9 @@
 #include "lispy.h"
 
+#define LVAL_STRCPY(x, v, field) \
+    x->field = malloc(strlen(v->field) + 1); \
+    strcpy(x->field, v->field);
+
 #pragma region constructors
 lval* lval_fn(lbuiltin fn) {
     lval* v = malloc(sizeof(lval));
@@ -43,6 +47,28 @@ lval* lval_qexpr() {
     lval* v = lval_sexpr();
     v->type = LVAL_QEXPR;
     return v;
+}
+
+// copy an lval
+lval* lval_copy(lval* v) {
+    lval* x = malloc(sizeof(lval));
+    x->type = v->type;
+    switch(v->type) {
+        case LVAL_FN: x->fn = v->fn; break;
+        case LVAL_NUM: x->num = v->num; break;
+        case LVAL_ERR: LVAL_STRCPY(x, v, err); break;
+        case LVAL_OP: LVAL_STRCPY(x, v, op); break;
+        case LVAL_QEXPR: 
+        case LVAL_SEXPR:
+            x->cell_count = v->cell_count;
+            x->cell = malloc(sizeof(lval*) * x->cell_count);
+            for (int i = 0; i < x->cell_count; i++) {
+                // we need the recursive call here to copy all contents
+                x->cell[i] = lval_copy(v->cell[i]);
+            }
+            break;
+    }
+    return x;
 }
 
 // add lval* v to lval* x->cell

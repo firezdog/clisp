@@ -34,5 +34,5 @@ See lispy.h
 * we need a function to copy things -- useful for putting them into and taking them out of the environment.  We can copy the following
   1. numbers -- field
   2. functions -- field
-  3. strings -- malloc and strcpy
+  3. strings (i.e. errors) -- malloc and strcpy
   4. lists -- allocate and then copy item by item.
