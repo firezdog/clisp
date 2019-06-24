@@ -54,7 +54,11 @@ typedef struct lval {
     struct lval** cell;
     int cell_count;
 } lval;
-typedef struct lenv lenv;
+typedef struct lenv {
+    int count;
+    char** variables;
+    lval** assignments;
+} lenv;
 typedef lval*(*lbuiltin)(lenv*, lval*);
 
 lval* lval_num(double x);
@@ -65,6 +69,8 @@ lval* lval_qexpr();
 lval* lval_add(lval* x, lval* v);
 void lval_del(lval* v);
 void delete_cells(lval* v);
+lenv* lenv_new(void);
+void lenv_del(lenv* v);
 
 void lval_print(lval* v);
 void lval_sexpr_print(lval* v, char open, char close);

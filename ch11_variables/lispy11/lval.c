@@ -49,6 +49,25 @@ lval* lval_qexpr() {
     return v;
 }
 
+lenv* lenv_new(void) {
+    lenv* v = malloc(sizeof(lenv));
+    v->count = 0;
+    v->variables = NULL;
+    v->assignments = NULL;
+    return v;
+}
+
+void lenv_del(lenv* v) {
+    /* iterate over variables and assignments and delete / free them */
+    for (int i = 0; i < v->count; i++) {
+        free(v->variables[i]);
+        lval_del(v->assignments[i]);
+    }
+    free(v->variables);
+    free(v->assignments);
+    free(v);
+}
+
 // copy an lval
 lval* lval_copy(lval* v) {
     lval* x = malloc(sizeof(lval));

@@ -36,3 +36,9 @@ See lispy.h
   2. functions -- field
   3. strings (i.e. errors) -- malloc and strcpy
   4. lists -- allocate and then copy item by item.
+# Environment
+* A kind of dictionary relating names and values (see lis.py)
+* strategy -- two arrays of equal length -- for a variable s, find n in keys such that keys[n] = s, then values[n] will be the value for s.  (Offhand this suggests to me that variable lookup is going to be linear time?)
+* we define lenv accordingly and create a constructorn / destroyer
+* then we're going to need to functions to add to variables and assignment fields and associate them?
+* ^ yes -- one function to add to the environment (lenv_put), another to read from it (lenv_get)
