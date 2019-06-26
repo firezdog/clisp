@@ -8,7 +8,6 @@
 
 #pragma region history
 #if defined(__CYGWIN__) | defined(_WIN32)
-
 char* readline(char* prompt) {
     fputs(prompt, stdout);
     fgets(buffer, 2048, stdin);
@@ -21,15 +20,12 @@ char* readline(char* prompt) {
     // return string
     return cpy;
 }
-
 /* Fake add_history function -- not needed in windows implementation */
 void add_history(char* unused) {}
-
 #else
 // compile with flag "-ledit"
 // #include <editline/history.h> // not needed on mac
 #include <editline/readline.h>
-
 #endif
 #pragma endregion
 
@@ -44,7 +40,6 @@ enum {
     LERR_NUM, 
     LERR_OP, 
     LERR_DIV_ZERO };
-
 typedef struct lval {
     int type;
     double num;
@@ -54,13 +49,6 @@ typedef struct lval {
     struct lval** cell;
     int cell_count;
 } lval;
-typedef struct lenv {
-    int count;
-    char** variables;
-    lval** assignments;
-} lenv;
-typedef lval*(*lbuiltin)(lenv*, lval*);
-
 lval* lval_num(double x);
 lval* lval_err(char* mesage);
 lval* lval_op(char* op);
@@ -69,13 +57,25 @@ lval* lval_qexpr();
 lval* lval_add(lval* x, lval* v);
 void lval_del(lval* v);
 void delete_cells(lval* v);
+#pragma endregion
+
+#pragma region lenv
+typedef struct lenv {
+    int count;
+    char** variables;
+    lval** assignments;
+} lenv;
 lenv* lenv_new(void);
 void lenv_del(lenv* v);
+void lenv_put(lenv* e, lval* a);
+lval* lenv_get(lenv* e, char* a);
+typedef lval*(*lbuiltin)(lenv*, lval*);
+#pragma endregion
 
+#pragma region io
 void lval_print(lval* v);
 void lval_sexpr_print(lval* v, char open, char close);
 void lval_println(lval* v);
-
 lval* lval_read_num(mpc_ast_t* t);
 lval* lval_read(mpc_ast_t* t);
 #pragma endregion

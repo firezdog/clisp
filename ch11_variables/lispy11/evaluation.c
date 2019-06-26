@@ -10,10 +10,10 @@
 #define BUILTIN_EMPTY_CHECK(item, function) \
     if(item->cell[0]->cell_count == 0) { lval_del(item); return lval_err(function " does not accept an empty quote."); }
 
-lval* lval_eval_sexpr(lval* v) {
+lval* lval_eval_sexpr(lenv* e, lval* v) {
     // evaluate all the children with lval_eval
     for (int i = 0; i < v->cell_count; i++) {
-        v->cell[i] = lval_eval(v->cell[i]);
+        v->cell[i] = lval_eval(e, v->cell[i]);
     }
     // check for and return first error (lval_take)
     for (int i = 0; i < v->cell_count; i++) {
@@ -30,15 +30,20 @@ lval* lval_eval_sexpr(lval* v) {
         lval_del(f); lval_del(v);
         return lval_err("S-expression must start with a symbol.");
     }
-    // if it is a symbol, check it and pass it to builtin_op to calculate
-    lval* result = builtin(v, f->op);
+    // if it is a symbol, run its callback on v to evaluate
+    lval* result = f->fn(e, v);
     lval_del(f);
     return result;
 }
 
 // evaluates the child of an sexpr based on whether or not it itself is an sexpr
-lval* lval_eval(lval* v) {
-    if (v->type == LVAL_SEXPR) { return lval_eval_sexpr(v); }
+lval* lval_eval(lenv* e, lval* v) {
+    if (v->type == LVAL_OP) { 
+        lval* x = lenv_get(e, v); 
+        lval_del(v); 
+        return x; 
+    }
+    if (v->type == LVAL_SEXPR) { return lval_eval_sexpr(e, v); }
     return v;
 }
 

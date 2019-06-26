@@ -42,3 +42,12 @@ See lispy.h
 * we define lenv accordingly and create a constructorn / destroyer
 * then we're going to need to functions to add to variables and assignment fields and associate them?
 * ^ yes -- one function to add to the environment (lenv_put), another to read from it (lenv_get)
+* My question: why is it necessary to have a separate list of variables at all, given that lval's now have a variable field built in?  Maybe I can experiment in a later version with an abridged lenv
+# Evaluation
+* Update the evaluation function by (1) passing in an environment and (2) looking up symbols within that environment.  (? -- where does the environment get instantiated -- I guess where the function is first called?)
+* I'm guessing this replaces builtin() -- now nothing will be built in -- we will just have predefined variables
+* Maybe -- but really we're updating lval_eval to explicitly check symbols and evaluate them using the environment.
+* Yes -- the lval_eval_sexpr() function now takes an environment.
+* But we use the callback to evaluate (this is where lbuiltin comes in)
+# Builtins
+* this leads to the need to "register" our builtins (by creating an environment with predefined entries) instead of putting them in a function
