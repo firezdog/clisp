@@ -51,3 +51,18 @@ See lispy.h
 * But we use the callback to evaluate (this is where lbuiltin comes in)
 # Builtins
 * this leads to the need to "register" our builtins (by creating an environment with predefined entries) instead of putting them in a function
+* redo builtin functions.  How?
+
+```
+lval* builtin_add(lenv* e, lval* a) {
+  return builtin_op(e, a, "+");
+}
+```
+
+We now have a builtin_add function that calls builtin_op with an environment, an lval, and "+" -- it will then be processed normally.  (What does builtin_op do with the environment?)
+* builtin still gets called, we just have a variety of builtin_x as intermediaries (will be associated with default vals in env)
+* registration: for each builtin, call lval_put with needed var
+* this involves creating lval's for the symbols and functions, then deleting them (sub-function)
+* seems like basically we need to associate one of our builtin funcs with a pointer and then put that in an lval in the env
+* this is where the magic of our builtin declaration comes in -- it allows us to pass functions with pointers.  See above.
+* we register everything in lispy.c when starting the app

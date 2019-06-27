@@ -40,7 +40,10 @@ enum {
     LERR_NUM, 
     LERR_OP, 
     LERR_DIV_ZERO };
-typedef struct lval {
+typedef struct lval lval;
+typedef struct lenv lenv;
+typedef lval*(*lbuiltin)(lenv*, lval*);
+struct lval {
     int type;
     double num;
     char* err;
@@ -48,28 +51,31 @@ typedef struct lval {
     lbuiltin fn;
     struct lval** cell;
     int cell_count;
-} lval;
+};
+lval* lval_fn(lbuiltin fn);
 lval* lval_num(double x);
 lval* lval_err(char* mesage);
 lval* lval_op(char* op);
 lval* lval_sexpr();
 lval* lval_qexpr();
+lval* lval_copy(lval* v);
 lval* lval_add(lval* x, lval* v);
 void lval_del(lval* v);
 void delete_cells(lval* v);
 #pragma endregion
 
 #pragma region lenv
-typedef struct lenv {
+struct lenv {
     int count;
     char** variables;
     lval** assignments;
-} lenv;
+};
 lenv* lenv_new(void);
 void lenv_del(lenv* v);
-void lenv_put(lenv* e, lval* a);
-lval* lenv_get(lenv* e, char* a);
-typedef lval*(*lbuiltin)(lenv*, lval*);
+void lenv_put(lenv* e, lval* var, lval* asgn);
+lval* lenv_get(lenv* e, lval* var);
+void lenv_add_builtin(lenv* e, char* name, lbuiltin fn);
+void lenv_add_builtins(lenv* e);
 #pragma endregion
 
 #pragma region io
@@ -81,21 +87,26 @@ lval* lval_read(mpc_ast_t* t);
 #pragma endregion
 
 #pragma region evaluation
-lval* lval_eval_sexpr(lval* v);
-lval* lval_eval(lval* v);
+lval* lval_eval_sexpr(lenv* e, lval* v);
+lval* lval_eval(lenv* e, lval* v);
 lval* lval_take(lval* v, int i);
 lval* lval_pop(lval* v, int i);
-lval* builtin_op(lval* a, char* op);
-lval* builtin_cons(lval* a);
-lval* builtin_head(lval* a);
-lval* builtin_tail(lval* a);
-lval* builtin_list(lval* a);
-lval* builtin_eval(lval* a);
-lval* builtin_join(lval* a);
-lval* builtin_init(lval* a);
-lval* builtin_len(lval* a);
+lval* builtin_op(lenv* e, lval* a, char* op);
+lval* builtin_add(lenv* e, lval* a);
+lval* builtin_subtract(lenv* e, lval* a);
+lval* builtin_divide(lenv* e, lval* a);
+lval* builtin_multiply(lenv* e, lval* a);
+lval* builtin_modulus(lenv* e, lval* a);
+lval* builtin_cons(lenv* e, lval* a);
+lval* builtin_head(lenv* e, lval* a);
+lval* builtin_tail(lenv* e, lval* a);
+lval* builtin_list(lenv* e, lval* a);
+lval* builtin_eval(lenv* e, lval* a);
+lval* builtin_join(lenv* e, lval* a);
+lval* builtin_init(lenv* e, lval* a);
+lval* builtin_len(lenv* e, lval* a);
 lval* lval_join(lval* x, lval* y);
-lval* builtin(lval* a, char* func);
+lval* builtin(lenv* e, lval* a, char* func);
 int check_div_0(double x);
 #pragma endregion
 
@@ -110,7 +121,7 @@ mpc_parser_t* Expr;
 mpc_parser_t* Lispy;
 void define_grammar(mpc_parser_t* Numeral, mpc_parser_t* Operator, mpc_parser_t* Sexpr, mpc_parser_t* Qexpr, mpc_parser_t* Expr, mpc_parser_t* Lispy);
 mpc_parser_t* init_grammar();
-void parse();
+void parse(lenv* e);
 void cleanup();
 #pragma endregion
 

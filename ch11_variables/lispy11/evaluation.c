@@ -26,9 +26,9 @@ lval* lval_eval_sexpr(lenv* e, lval* v) {
     // separate first element with lval_pop
     lval* f = lval_pop(v, 0);
     // if it is not a symbol, delete it and other values, return error
-    if (f->type != LVAL_OP) {
+    if (f->type != LVAL_FN) {
         lval_del(f); lval_del(v);
-        return lval_err("S-expression must start with a symbol.");
+        return lval_err("S-expression must start with a function.");
     }
     // if it is a symbol, run its callback on v to evaluate
     lval* result = f->fn(e, v);
@@ -67,22 +67,23 @@ lval* lval_take(lval* v, int i) {
     return t;
 }
 
-lval* builtin(lval* a, char* func) {
-    if (!strcmp("cons", func)) return builtin_cons(a);
-    if (!strcmp("init", func)) return builtin_init(a);
-    if (!strcmp("len", func)) return builtin_len(a);
-    if (!strcmp("head", func)) return builtin_head(a);
-    if (!strcmp("tail", func)) return builtin_tail(a);
-    if (!strcmp("list", func)) return builtin_list(a);
-    if (!strcmp("eval", func)) return builtin_eval(a);
-    if (!strcmp("join", func)) return builtin_join(a);
-    if (strstr("+-*/%", func)) return builtin_op(a, func);
+// I don't think this is getting used anymore? builtin_op is, but not this.
+lval* builtin(lenv* e, lval* a, char* func) {
+    if (!strcmp("cons", func)) return builtin_cons(e, a);
+    if (!strcmp("init", func)) return builtin_init(e, a);
+    if (!strcmp("len", func)) return builtin_len(e, a);
+    if (!strcmp("head", func)) return builtin_head(e, a);
+    if (!strcmp("tail", func)) return builtin_tail(e, a);
+    if (!strcmp("list", func)) return builtin_list(e, a);
+    if (!strcmp("eval", func)) return builtin_eval(e, a);
+    if (!strcmp("join", func)) return builtin_join(e, a);
+    if (strstr("+-*/%", func)) return builtin_op(e, a, func);
     lval_del(a);
     return lval_err("Unknown function.");
 }
 
 // requirement: return error if any input is not a number.
-lval* builtin_op(lval* a, char* op) {
+lval* builtin_op(lenv* e, lval* a, char* op) {
     // 1. check that all arguments are numbers.
     for (int i = 0; i < a->cell_count; i++) {
         if (a->cell[i]->type != LVAL_NUM) {
@@ -117,7 +118,28 @@ lval* builtin_op(lval* a, char* op) {
     lval_del(a); return result;
 }
 
-lval* builtin_cons(lval* a) {
+// seems like we could use macros here also.
+lval* builtin_add(lenv* e, lval* a) {
+    return builtin_op(e, a, "+");
+}
+
+lval* builtin_multiply(lenv* e, lval* a) {
+    return builtin_op(e, a, "*");
+}
+
+lval* builtin_subtract(lenv* e, lval* a) {
+    return builtin_op(e, a, "-");
+}
+
+lval* builtin_divide(lenv* e, lval* a) {
+    return builtin_op(e, a, "/");
+}
+
+lval* builtin_modulus(lenv* e, lval* a) {
+    return builtin_op(e, a, "%");
+}
+
+lval* builtin_cons(lenv* e, lval* a) {
     BUILTIN_ARG_CHECK(a, 2, "cons");
     LASSERT(a, a->cell[1]->type == LVAL_QEXPR, "Function 'cons' requires a value followed by an expression in curly brackets (q-expression).");
     lval* x = lval_qexpr();
@@ -125,7 +147,7 @@ lval* builtin_cons(lval* a) {
     return lval_join(x, a->cell[1]);
 }
 
-lval* builtin_init(lval* a) {
+lval* builtin_init(lenv* e, lval* a) {
     /* to return everything but the last, get the length of a, n, pop off n-1, assuming zero indexing, and return.  edge case -- must not be empty -- so that init of a singleton is the empty list. */
     BUILTIN_ARG_CHECK(a, 1, "init");
     BUILTIN_EMPTY_CHECK(a, "init");
@@ -136,14 +158,14 @@ lval* builtin_init(lval* a) {
     return v;
 }
 
-lval* builtin_len(lval* a) {
+lval* builtin_len(lenv* e, lval* a) {
     BUILTIN_ARG_CHECK(a, 1, "len");
     LASSERT(a, a->cell[0]->type == LVAL_QEXPR, "Function 'len' only accepts expressions in curly brackets (q-expressions).");
     int n = a->cell[0]->cell_count;
     return lval_num(n);
 }
 
-lval* builtin_head(lval* a) {
+lval* builtin_head(lenv* e, lval* a) {
     /*Check error conditions*/
     BUILTIN_ARG_CHECK(a, 1, "head");
     LASSERT(a, a->cell[0]->type == LVAL_QEXPR, "Function 'head' only accepts expressions in curly brackets (q-expressions).");
@@ -156,7 +178,7 @@ lval* builtin_head(lval* a) {
     return v;
 }
 
-lval* builtin_tail(lval* a) {
+lval* builtin_tail(lenv* e, lval* a) {
     /*Check error conditions*/
     BUILTIN_ARG_CHECK(a, 1, "tail");
     LASSERT(a, a->cell[0]->type == LVAL_QEXPR, "Function 'tail' only accepts expressions in curly brackets (q-expressions).");
@@ -168,20 +190,20 @@ lval* builtin_tail(lval* a) {
 }
 
 // convert lval* a to a q_expr.
-lval* builtin_list(lval* a) {
+lval* builtin_list(lenv* e, lval* a) {
     a->type = LVAL_QEXPR;
     return a;
 }
 
-lval* builtin_eval(lval* a) {
+lval* builtin_eval(lenv* e, lval* a) {
     BUILTIN_ARG_CHECK(a, 1, "eval");
     LASSERT(a, a->cell[0]->type == LVAL_QEXPR, "Function 'eval' only accepts expressions in curly brackets (q-expressions).")
     lval* x = lval_take(a, 0);
     x->type = LVAL_SEXPR;
-    return lval_eval(x);
+    return lval_eval(e, x);
 }
 
-lval* builtin_join(lval* a) {
+lval* builtin_join(lenv* e, lval* a) {
     for (int i = 0; i < a->cell_count; i++) {
         // (1) are all args QEXPR?
         LASSERT(a, a->cell[i]->type == LVAL_QEXPR, "Function 'join' only accepts expressions in curly brackets (q-expressions).")
