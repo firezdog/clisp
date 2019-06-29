@@ -68,19 +68,19 @@ lval* lval_take(lval* v, int i) {
 }
 
 // I don't think this is getting used anymore? builtin_op is, but not this.
-lval* builtin(lenv* e, lval* a, char* func) {
-    if (!strcmp("cons", func)) return builtin_cons(e, a);
-    if (!strcmp("init", func)) return builtin_init(e, a);
-    if (!strcmp("len", func)) return builtin_len(e, a);
-    if (!strcmp("head", func)) return builtin_head(e, a);
-    if (!strcmp("tail", func)) return builtin_tail(e, a);
-    if (!strcmp("list", func)) return builtin_list(e, a);
-    if (!strcmp("eval", func)) return builtin_eval(e, a);
-    if (!strcmp("join", func)) return builtin_join(e, a);
-    if (strstr("+-*/%", func)) return builtin_op(e, a, func);
-    lval_del(a);
-    return lval_err("Unknown function.");
-}
+// lval* builtin(lenv* e, lval* a, char* func) {
+//     if (!strcmp("cons", func)) return builtin_cons(e, a);
+//     if (!strcmp("init", func)) return builtin_init(e, a);
+//     if (!strcmp("len", func)) return builtin_len(e, a);
+//     if (!strcmp("head", func)) return builtin_head(e, a);
+//     if (!strcmp("tail", func)) return builtin_tail(e, a);
+//     if (!strcmp("list", func)) return builtin_list(e, a);
+//     if (!strcmp("eval", func)) return builtin_eval(e, a);
+//     if (!strcmp("join", func)) return builtin_join(e, a);
+//     if (strstr("+-*/%", func)) return builtin_op(e, a, func);
+//     lval_del(a);
+//     return lval_err("Unknown function.");
+// }
 
 // requirement: return error if any input is not a number.
 lval* builtin_op(lenv* e, lval* a, char* op) {
@@ -119,6 +119,26 @@ lval* builtin_op(lenv* e, lval* a, char* op) {
 }
 
 // seems like we could use macros here also.
+
+// remember this is taking an s-expression consisting of a q-expression and a series of s-expressions of length equal to the length of the q-expression
+lval* builtin_define(lenv* e, lval* a){
+    // the arguments are the cells of a
+    LASSERT(a, a->cell[0]->type == LVAL_QEXPR, "First argument should be a list.")
+    lval* symbols = a->cell[0];
+    for (int i = 0; i < symbols->cell_count; i++) {
+        LASSERT(symbols->cell[i], symbols->cell[i]->type == LVAL_OP, "First argument is not a list of symbols.");
+    }
+    int nSyms = symbols->cell_count;
+    int argumentParity = nSyms + 1 == a->cell_count;
+    LASSERT(a, argumentParity, "List of definiens and series of definienda must be of equal length.");
+    for (int i = 0; i < symbols->cell_count; i++) {
+        lenv_put(e, symbols->cell[i], a->cell[i + 1]);
+    }
+    lval_del(a);
+    // the empty expression
+    return lval_sexpr();
+}
+
 lval* builtin_add(lenv* e, lval* a) {
     return builtin_op(e, a, "+");
 }

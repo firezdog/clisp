@@ -93,6 +93,7 @@ lval* lval_take(lval* v, int i);
 lval* lval_pop(lval* v, int i);
 lval* builtin_op(lenv* e, lval* a, char* op);
 lval* builtin_add(lenv* e, lval* a);
+lval* builtin_define(lenv* e, lval* a);
 lval* builtin_subtract(lenv* e, lval* a);
 lval* builtin_divide(lenv* e, lval* a);
 lval* builtin_multiply(lenv* e, lval* a);

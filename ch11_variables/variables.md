@@ -1,8 +1,8 @@
-# Concepts
+# Immutability
 * variables will be immutable -- even when we "reassign" a variable, we just delete the old one and replace it
 * variables name (or point to?) values
 * environment: the dictionary (?) of names and their corresponding values for our program -- each instance of our program will have a new environment
-# Symbols Syntax
+# Symbol Syntax
 * allow more options for symbols:
 
 ```
@@ -43,7 +43,7 @@ See lispy.h
 * then we're going to need to functions to add to variables and assignment fields and associate them?
 * ^ yes -- one function to add to the environment (lenv_put), another to read from it (lenv_get)
 * My question: why is it necessary to have a separate list of variables at all, given that lval's now have a variable field built in?  Maybe I can experiment in a later version with an abridged lenv
-# Evaluation
+# Variable Evaluation
 * Update the evaluation function by (1) passing in an environment and (2) looking up symbols within that environment.  (? -- where does the environment get instantiated -- I guess where the function is first called?)
 * I'm guessing this replaces builtin() -- now nothing will be built in -- we will just have predefined variables
 * Maybe -- but really we're updating lval_eval to explicitly check symbols and evaluate them using the environment.
@@ -66,3 +66,15 @@ We now have a builtin_add function that calls builtin_op with an environment, an
 * seems like basically we need to associate one of our builtin funcs with a pointer and then put that in an lval in the env
 * this is where the magic of our builtin declaration comes in -- it allows us to pass functions with pointers.  See above.
 * we register everything in lispy.c when starting the app
+
+* Remember that on input we parse the input and then send it to lval_eval, which will know look up operations from the environment, on the one hand, evaluate full expressions, on the other.  So now lval_eval gets an environment and looks up symbols in the environment
+* (It's strange to me that lval_eval calls a function that then calls it -- kind of indirect recursion)
+* lval_eval will first receive an sexpr (most likely?) from lval_read
+* we also change lval_eval_sexpr (the "helper" function) to evaluate with functions instead of directly "routing" symbols
+* note that now, in the process of evaluating s-expressions, all their symbols get replaced with variable assignments from the environment
+# Define Function
+* We will allow a user to define her own variables
+* Syntax: define \<quoted name> \<value>
+* associate a list of symbols with a series of values
+* check that input types are correct
+* iterate through each symbol and put corresponding value in environment (what if they are unequal?), return () on success or else error
