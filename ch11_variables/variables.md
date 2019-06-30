@@ -85,3 +85,5 @@ We now have a builtin_add function that calls builtin_op with an environment, an
 * va_start, va_arg, and va_end are used as part of "..." api
 * allocate a buffer of 512 bytes for the finished string (we will shrink if less -- but we will not allow more.)
 * we use vsnprintf to put the arguments into our format string and copy that into the field. (this all sounds complicated, but we're just leveraging a builtin c api -- or macros)
+* we will also use our new lva_err in macros -- but using __VA_ARGS__ to get all the args instead (we can use rest operator in the macro)
+* for reporting of type errors, we should add a helper function that tells us what type of argument was passed into a function.

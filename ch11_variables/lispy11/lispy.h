@@ -30,15 +30,16 @@ void add_history(char* unused) {}
 #pragma endregion
 
 #pragma region macros
-#define LASSERT(args, cond, err) \
-    if(!(cond)) { lval_del(args); return lval_err(err); }
+#define LASSERT(args, cond, err, ...) \
+    if(!(cond)) { lval_del(args); return lval_err(err, ##__VA_ARGS__); }
 
-#define BUILTIN_ARG_CHECK(item, num_args, function) \
-    if(!(item->cell_count == num_args)) { lval_del(item); return lval_err(function " only accepts " #num_args " argument(s)"); }
+// as is this seems repetitive -- wish num_args could be used along with item->cell_count in the string.
+#define BUILTIN_ARG_CHECK(item, num_args, ...) \
+    if(!(item->cell_count == num_args)) { lval_del(item); return lval_err("<%s> only accepts %d argument(s) but was passed %d argument(s)", ##__VA_ARGS__); }
 // this could be generalized to a general check that list is of length n
 
-#define BUILTIN_EMPTY_CHECK(item, function) \
-    if(item->cell[0]->cell_count == 0) { lval_del(item); return lval_err(function " does not accept an empty quote."); }
+#define BUILTIN_EMPTY_CHECK(item, ...) \
+    if(item->cell[0]->cell_count == 0) { lval_del(item); return lval_err("%s does not accept an empty quote.", ##__VA_ARGS__); }
 #pragma endregion
 
 #pragma region lval

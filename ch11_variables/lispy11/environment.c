@@ -44,8 +44,7 @@ lval* lenv_get(lenv* e, lval* var) {
   for (int i = 0; i < e->count; i++) {
     if (!strcmp(e->variables[i], var->op)) return lval_copy(e->assignments[i]);
   }
-  // replace with macro to return specific name of undefined variable
-  return lval_err("undefined symbol");
+  return lval_err("undefined symbol: %s", var->op);
 }
 
 void lenv_add_builtin(lenv* e, char* name, lbuiltin fn) {
