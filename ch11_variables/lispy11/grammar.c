@@ -11,7 +11,7 @@ void define_grammar(mpc_parser_t* Numeral, mpc_parser_t* Operator, mpc_parser_t*
     Numeral, Operator, Sexpr, Qexpr, Expr, Lispy);
 }
 
-mpc_parser_t* init_grammar() {
+void init_grammar() {
     Numeral = mpc_new("numeral");
     Operator = mpc_new("operator");
     Sexpr = mpc_new("sexpr");
@@ -19,7 +19,6 @@ mpc_parser_t* init_grammar() {
     Expr = mpc_new("expr");
     Lispy = mpc_new("lispy");
     define_grammar(Numeral, Operator, Sexpr, Qexpr, Expr, Lispy);
-    return Lispy;
 }
 
 void parse(lenv* e) {

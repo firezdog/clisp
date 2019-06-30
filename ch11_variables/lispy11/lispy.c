@@ -2,7 +2,7 @@
 
 int main(int argc, char** argv) {
     // new function eventually?
-    mpc_parser_t* Lispy = init_grammar();
+    init_grammar();
     lenv* e = lenv_new();
     lenv_add_builtins(e);
     

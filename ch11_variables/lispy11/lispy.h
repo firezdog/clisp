@@ -137,7 +137,7 @@ mpc_parser_t* Qexpr;
 mpc_parser_t* Expr;
 mpc_parser_t* Lispy;
 void define_grammar(mpc_parser_t* Numeral, mpc_parser_t* Operator, mpc_parser_t* Sexpr, mpc_parser_t* Qexpr, mpc_parser_t* Expr, mpc_parser_t* Lispy);
-mpc_parser_t* init_grammar();
+void init_grammar();
 void parse(lenv* e);
 void cleanup();
 #pragma endregion
