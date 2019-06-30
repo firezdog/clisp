@@ -103,9 +103,9 @@ void lenv_add_builtins(lenv* e);
 
 #pragma region io
 char* return_type(int t);
-void lval_print(lval* v);
-void lval_sexpr_print(lval* v, char open, char close);
-void lval_println(lval* v);
+void lval_print(lenv* e, lval* v);
+void lval_sexpr_print(lenv* e, lval* v, char open, char close);
+void lval_println(lenv* e, lval* v);
 lval* lval_read_num(mpc_ast_t* t);
 lval* lval_read(mpc_ast_t* t);
 #pragma endregion

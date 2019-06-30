@@ -1,26 +1,32 @@
 #include "lispy.h"
 
-void lval_print(lval* v) {
+void lval_print(lenv* e, lval* v) {
     switch(v->type) {
         case(LVAL_NUM)      :   printf("%g", v->num);  break;
         case(LVAL_ERR)      :   printf("Error: %s", v->err); break;
         case(LVAL_OP)       :   printf("%s", v->op); break; 
-        case(LVAL_FN)       :   printf("<function>"); break;
-        case(LVAL_SEXPR)    :   lval_sexpr_print(v, '(', ')'); break;
-        case(LVAL_QEXPR)    :   lval_sexpr_print(v, '{', '}'); break; 
+        case(LVAL_FN)       :
+            for (int i = 0; i < e->count; i++) {
+                if (e->assignments[i]->fn == v->fn) {
+                    printf("<function>: %s", e->variables[i]); break;
+                }
+            }
+            break;
+        case(LVAL_SEXPR)    :   lval_sexpr_print(e, v, '(', ')'); break;
+        case(LVAL_QEXPR)    :   lval_sexpr_print(e, v, '{', '}'); break; 
     }
 }
 
-void lval_sexpr_print(lval* v, char open, char close) {
+void lval_sexpr_print(lenv* e, lval* v, char open, char close) {
     putchar(open);
     for (int i = 0; i < v->cell_count; i++) {
-        lval_print(v->cell[i]);
+        lval_print(e, v->cell[i]);
         if (i != v->cell_count-1) { putchar(' '); }
     }
     putchar(close);
 }
 
-void lval_println(lval* v) { lval_print(v); putchar('\n'); }
+void lval_println(lenv* e, lval* v) { lval_print(e, v); putchar('\n'); }
 #pragma endregion
 
 #pragma region read
