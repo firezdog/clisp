@@ -79,7 +79,7 @@ lval* builtin_modulus(lenv* e, lval* a) {
 
 lval* builtin_cons(lenv* e, lval* a) {
     BUILTIN_ARG_CHECK(a, 2, "cons", 2, a->cell_count);
-    LASSERT(a, a->cell[1]->type == LVAL_QEXPR, "<cons> requires a value followed by an expression in curly brackets (q-expression).");
+    BUILTIN_TYPE_CHECK(a, 1, "cons", LVAL_QEXPR);
     lval* x = lval_qexpr();
     x = lval_add(x, a->cell[0]);
     return lval_join(x, a->cell[1]);
@@ -88,8 +88,8 @@ lval* builtin_cons(lenv* e, lval* a) {
 lval* builtin_init(lenv* e, lval* a) {
     /* to return everything but the last, get the length of a, n, pop off n-1, assuming zero indexing, and return.  edge case -- must not be empty -- so that init of a singleton is the empty list. */
     BUILTIN_ARG_CHECK(a, 1, "init", 1, a->cell_count);
+    BUILTIN_TYPE_CHECK(a, 0, "init", LVAL_QEXPR);
     BUILTIN_EMPTY_CHECK(a, "init");
-    LASSERT(a, a->cell[0]->type == LVAL_QEXPR, "<init> only accepts expressions in curly brackets (q-expressions).");
     int n = a->cell[0]->cell_count;
     lval* v = lval_take(a, 0);
     lval_del(lval_pop(v,n-1));

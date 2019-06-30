@@ -53,3 +53,16 @@ lval* lval_read(mpc_ast_t* t) {
     }
     return x;
 }
+
+// enum => name of enum
+char* return_type(int t) {
+    switch(t) {
+        case(LVAL_ERR): return "error";
+        case(LVAL_FN): return "function";
+        case(LVAL_NUM): return "number";
+        case(LVAL_OP): return "operator / symbol";
+        case(LVAL_QEXPR): return "quoted expression";
+        case(LVAL_SEXPR): return "expression";
+        default: return "unknown";
+    }
+}

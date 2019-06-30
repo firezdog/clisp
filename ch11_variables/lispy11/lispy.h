@@ -30,6 +30,16 @@ void add_history(char* unused) {}
 #pragma endregion
 
 #pragma region macros
+// (lval, int, string, enum) => lval
+#define BUILTIN_TYPE_CHECK(value, arg, function, _type) \
+    lval* item = value->cell[arg]; \
+    if(!(item->type == _type)) \
+        { \
+            lval* e = lval_err("%s requires an argument of type [%s] but got an argument of type [%s]", \
+            function, return_type(_type), return_type(item->type)); \
+            lval_del(value); \
+            return e; \
+        }
 #define LASSERT(args, cond, err, ...) \
     if(!(cond)) { lval_del(args); return lval_err(err, ##__VA_ARGS__); }
 
@@ -92,6 +102,7 @@ void lenv_add_builtins(lenv* e);
 #pragma endregion
 
 #pragma region io
+char* return_type(int t);
 void lval_print(lval* v);
 void lval_sexpr_print(lval* v, char open, char close);
 void lval_println(lval* v);
