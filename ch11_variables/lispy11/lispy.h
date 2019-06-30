@@ -29,6 +29,18 @@ void add_history(char* unused) {}
 #endif
 #pragma endregion
 
+#pragma region macros
+#define LASSERT(args, cond, err) \
+    if(!(cond)) { lval_del(args); return lval_err(err); }
+
+#define BUILTIN_ARG_CHECK(item, num_args, function) \
+    if(!(item->cell_count == num_args)) { lval_del(item); return lval_err(function " only accepts " #num_args " argument(s)"); }
+// this could be generalized to a general check that list is of length n
+
+#define BUILTIN_EMPTY_CHECK(item, function) \
+    if(item->cell[0]->cell_count == 0) { lval_del(item); return lval_err(function " does not accept an empty quote."); }
+#pragma endregion
+
 #pragma region lval
 enum { 
     LVAL_FN,
@@ -54,7 +66,7 @@ struct lval {
 };
 lval* lval_fn(lbuiltin fn);
 lval* lval_num(double x);
-lval* lval_err(char* mesage);
+lval* lval_err(char* format, ...);
 lval* lval_op(char* op);
 lval* lval_sexpr();
 lval* lval_qexpr();
@@ -91,6 +103,10 @@ lval* lval_eval_sexpr(lenv* e, lval* v);
 lval* lval_eval(lenv* e, lval* v);
 lval* lval_take(lval* v, int i);
 lval* lval_pop(lval* v, int i);
+int check_div_0(double x);
+#pragma endregion
+
+#pragma region builtins
 lval* builtin_op(lenv* e, lval* a, char* op);
 lval* builtin_add(lenv* e, lval* a);
 lval* builtin_define(lenv* e, lval* a);
@@ -108,7 +124,6 @@ lval* builtin_init(lenv* e, lval* a);
 lval* builtin_len(lenv* e, lval* a);
 lval* lval_join(lval* x, lval* y);
 lval* builtin(lenv* e, lval* a, char* func);
-int check_div_0(double x);
 #pragma endregion
 
 #pragma region grammar

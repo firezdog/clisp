@@ -78,3 +78,10 @@ We now have a builtin_add function that calls builtin_op with an environment, an
 * associate a list of symbols with a series of values
 * check that input types are correct
 * iterate through each symbol and put corresponding value in environment (what if they are unequal?), return () on success or else error
+# Error Reporting
+* We want to create something like printf that will allow us to pass multiple values to the error reporter -- then it can give us specific information about what went wrong
+* I did a little of this with the macros, but admittedly not very robustly.
+* add ... -- rest operator (not related to REST -- it gives us the *rest* of the arguments, cf. JavaScript) to the lval_err constructor
+* va_start, va_arg, and va_end are used as part of "..." api
+* allocate a buffer of 512 bytes for the finished string (we will shrink if less -- but we will not allow more.)
+* we use vsnprintf to put the arguments into our format string and copy that into the field. (this all sounds complicated, but we're just leveraging a builtin c api -- or macros)

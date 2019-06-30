@@ -18,11 +18,15 @@ lval* lval_num(double x) {
     return v;
 }
 
-lval* lval_err(char* message) {
+lval* lval_err(char* format, ...) {
     lval* v = malloc(sizeof(lval));
     v->type = LVAL_ERR;
-    v->err = malloc(strlen(message) + 1);
-    strcpy(v->err, message);
+    va_list args;
+    va_start(args, format);
+    v->err = malloc(512);
+    vsnprintf(v->err, 511, format, args);
+    v->err = realloc(v->err, strlen(v->err) + 1);
+    va_end(args);
     return v;
 }
 
