@@ -40,11 +40,11 @@ lval* builtin_op(lenv* e, lval* a, char* op) {
 
 // remember this is taking an s-expression consisting of a q-expression and a series of s-expressions of length equal to the length of the q-expression
 lval* builtin_define(lenv* e, lval* a){
-    // the arguments are the cells of a
-    LASSERT(a, a->cell[0]->type == LVAL_QEXPR, "First argument of <define> should be a list.")
+    // the arguments are the cells of "a"
+    BUILTIN_TYPE_CHECK(a, 0, "define", LVAL_QEXPR);
     lval* symbols = a->cell[0];
     for (int i = 0; i < symbols->cell_count; i++) {
-        LASSERT(symbols->cell[i], symbols->cell[i]->type == LVAL_OP, "First argument of <define> is not a list of symbols.");
+        BUILTIN_TYPE_CHECK(symbols, i, "define", LVAL_OP);
     }
     int nSyms = symbols->cell_count;
     int argumentParity = nSyms + 1 == a->cell_count;
@@ -98,7 +98,7 @@ lval* builtin_init(lenv* e, lval* a) {
 
 lval* builtin_len(lenv* e, lval* a) {
     BUILTIN_ARG_CHECK(a, 1, "len", 1, a->cell_count);
-    LASSERT(a, a->cell[0]->type == LVAL_QEXPR, "<len> only accepts expressions in curly brackets (q-expressions).");
+    BUILTIN_TYPE_CHECK(a, 0, "len", LVAL_QEXPR);
     int n = a->cell[0]->cell_count;
     return lval_num(n);
 }
@@ -106,7 +106,7 @@ lval* builtin_len(lenv* e, lval* a) {
 lval* builtin_head(lenv* e, lval* a) {
     /*Check error conditions*/
     BUILTIN_ARG_CHECK(a, 1, "head", 1, a->cell_count);
-    LASSERT(a, a->cell[0]->type == LVAL_QEXPR, "<head> only accepts expressions in curly brackets (q-expressions).");
+    BUILTIN_TYPE_CHECK(a, 0, "head", LVAL_QEXPR);
     BUILTIN_EMPTY_CHECK(a, "head");
     lval* v = lval_take(a, 0);
     // repeatedly pop and delete item at v->cell[1] until list only has head.
@@ -119,7 +119,7 @@ lval* builtin_head(lenv* e, lval* a) {
 lval* builtin_tail(lenv* e, lval* a) {
     /*Check error conditions*/
     BUILTIN_ARG_CHECK(a, 1, "tail", 1, a->cell_count);
-    LASSERT(a, a->cell[0]->type == LVAL_QEXPR, "<tail> only accepts expressions in curly brackets (q-expressions).");
+    BUILTIN_TYPE_CHECK(a, 0, "tail", LVAL_QEXPR);
     BUILTIN_EMPTY_CHECK(a, "tail");
     // pop the first value off of v.
     lval* v = lval_take(a, 0);
@@ -135,7 +135,7 @@ lval* builtin_list(lenv* e, lval* a) {
 
 lval* builtin_eval(lenv* e, lval* a) {
     BUILTIN_ARG_CHECK(a, 1, "eval", 1, a->cell_count);
-    LASSERT(a, a->cell[0]->type == LVAL_QEXPR, "<eval> only accepts expressions in curly brackets (q-expressions).")
+    BUILTIN_TYPE_CHECK(a, 0, "eval", LVAL_QEXPR);
     lval* x = lval_take(a, 0);
     x->type = LVAL_SEXPR;
     return lval_eval(e, x);
@@ -144,9 +144,9 @@ lval* builtin_eval(lenv* e, lval* a) {
 lval* builtin_join(lenv* e, lval* a) {
     for (int i = 0; i < a->cell_count; i++) {
         // (1) are all args QEXPR?
-        LASSERT(a, a->cell[i]->type == LVAL_QEXPR, "<join> only accepts expressions in curly brackets (q-expressions).")
-         // join args one by one using lval_join
+        BUILTIN_TYPE_CHECK(a, i, "join", LVAL_QEXPR);
     }
+    // join args one by one using lval_join
     lval* x = lval_pop(a, 0);
     while (a->cell_count) {
         x = lval_join(x, lval_pop(a, 0));
