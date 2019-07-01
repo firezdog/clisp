@@ -45,11 +45,10 @@ lval* builtin_define(lenv* e, lval* a){
     lval* symbols = a->cell[0];
     for (int i = 0; i < symbols->cell_count; i++) {
         BUILTIN_TYPE_CHECK(symbols, i, "define", LVAL_OP);
-        // oh no -- now defining a variable is an N^2 operation!
-        // this works as long as it is impossible for the user to define functions.
+        // oh no -- now defining a variable is an N^2 operation! (well technically N*M)
         char* symbol = symbols->cell[i]->op;
         for (int i = 0; i < e->count; i++) {
-            if (!strcmp(e->variables[i], symbol) && e->assignments[i]->type == LVAL_FN) { 
+            if (!strcmp(e->variables[i], symbol) && e->assignments[i]->builtin != NULL) { 
                 return lval_err("%s is a reserved word."); 
             }
         }
