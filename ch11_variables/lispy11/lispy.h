@@ -70,10 +70,19 @@ typedef struct lenv lenv;
 typedef lval*(*lbuiltin)(lenv*, lval*);
 struct lval {
     int type;
+
+    /* Basic */
     double num;
     char* err;
     char* op;
-    lbuiltin fn;
+    
+    /* function */
+    lbuiltin builtin;
+    lenv* env;
+    lval* formals;
+    lval* body;
+
+    /* Expression */
     struct lval** cell;
     int cell_count;
 };

@@ -48,7 +48,7 @@ lval* builtin_define(lenv* e, lval* a){
         // oh no -- now defining a variable is an N^2 operation! (well technically N*M)
         char* symbol = symbols->cell[i]->op;
         for (int i = 0; i < e->count; i++) {
-            if (!strcmp(e->variables[i], symbol) && e->assignments[i]->fn != NULL) { 
+            if (!strcmp(e->variables[i], symbol) && e->assignments[i]->builtin != NULL) { 
                 return lval_err("%s is a reserved word."); 
             }
         }
