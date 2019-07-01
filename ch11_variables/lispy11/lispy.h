@@ -6,6 +6,8 @@
 #include <stdlib.h>
 #include <string.h>
 
+int run_lisp;
+
 #pragma region history
 #if defined(__CYGWIN__) | defined(_WIN32)
 char* readline(char* prompt) {
@@ -136,6 +138,8 @@ lval* builtin_init(lenv* e, lval* a);
 lval* builtin_len(lenv* e, lval* a);
 lval* lval_join(lval* x, lval* y);
 lval* builtin(lenv* e, lval* a, char* func);
+lval* builtin_print_env(lenv* e, lval* v);
+lval* builtin_exit(lenv* e, lval* v);
 #pragma endregion
 
 #pragma region grammar

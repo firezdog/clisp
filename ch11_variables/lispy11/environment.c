@@ -70,6 +70,9 @@ void lenv_add_builtins(lenv* e) {
     lenv_add_builtin(e, "init", builtin_init);
     lenv_add_builtin(e, "len", builtin_len);
 
+    lenv_add_builtin(e, "env", builtin_print_env);
+    lenv_add_builtin(e, "exit", builtin_exit);
+
     // the most important of the builtins!
     lenv_add_builtin(e, "define", builtin_define);
 }

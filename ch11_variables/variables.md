@@ -87,3 +87,8 @@ We now have a builtin_add function that calls builtin_op with an environment, an
 * we use vsnprintf to put the arguments into our format string and copy that into the field. (this all sounds complicated, but we're just leveraging a builtin c api -- or macros)
 * we will also use our new lva_err in macros -- but using __VA_ARGS__ to get all the args instead (we can use rest operator in the macro)
 * for reporting of type errors, we should add a helper function that tells us what type of argument was passed into a function.
+# Other
+* Added function to print all variables in env with their values, but requires () or some argument in order to run (since all builtin functions must take an lval) -- otherwise it just prints that "env" is a function.
+* It would be neat if there were a way to document what functions require (how many arguments, what kind of arguments) in the program, much like "man" for linux
+* made it impossible to redefine a function (i.e. a builtin -- since users cannot define their own functions currently), but this reduces performance of variable lookup in define to N^2
+* exit function: loop will now run as long as a flag is true -- exit will change this flag.

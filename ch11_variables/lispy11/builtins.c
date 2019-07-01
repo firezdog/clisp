@@ -45,6 +45,14 @@ lval* builtin_define(lenv* e, lval* a){
     lval* symbols = a->cell[0];
     for (int i = 0; i < symbols->cell_count; i++) {
         BUILTIN_TYPE_CHECK(symbols, i, "define", LVAL_OP);
+        // oh no -- now defining a variable is an N^2 operation!
+        // this works as long as it is impossible for the user to define functions.
+        char* symbol = symbols->cell[i]->op;
+        for (int i = 0; i < e->count; i++) {
+            if (!strcmp(e->variables[i], symbol) && e->assignments[i]->type == LVAL_FN) { 
+                return lval_err("Error: %s is a reserved word."); 
+            }
+        }
     }
     int nSyms = symbols->cell_count;
     int argumentParity = nSyms + 1 == a->cell_count;
@@ -153,4 +161,17 @@ lval* builtin_join(lenv* e, lval* a) {
     }
     lval_del(a);
     return x;
+}
+
+lval* builtin_print_env(lenv* e, lval* v) {
+    for (int i = 0; i < e->count; i++) {
+        printf("%s: ", e->variables[i]);
+        lval_println(e, e->assignments[i]);
+    }
+    return lval_sexpr();
+}
+
+lval* builtin_exit(lenv* e, lval* v) {
+    run_lisp = 0;
+    return lval_sexpr();
 }

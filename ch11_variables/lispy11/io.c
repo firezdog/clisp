@@ -8,7 +8,7 @@ void lval_print(lenv* e, lval* v) {
         case(LVAL_FN)       :
             for (int i = 0; i < e->count; i++) {
                 if (e->assignments[i]->fn == v->fn) {
-                    printf("<function>: %s", e->variables[i]); break;
+                    printf("<function> %s", e->variables[i]); break;
                 }
             }
             break;
