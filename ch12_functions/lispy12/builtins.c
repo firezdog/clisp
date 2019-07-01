@@ -50,7 +50,7 @@ lval* builtin_define(lenv* e, lval* a){
         char* symbol = symbols->cell[i]->op;
         for (int i = 0; i < e->count; i++) {
             if (!strcmp(e->variables[i], symbol) && e->assignments[i]->type == LVAL_FN) { 
-                return lval_err("Error: %s is a reserved word."); 
+                return lval_err("%s is a reserved word."); 
             }
         }
     }
