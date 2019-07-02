@@ -7,7 +7,17 @@
 lval* lval_fn(lbuiltin fn) {
     lval* v = malloc(sizeof(lval));
     v->type = LVAL_FN;
-    v->fn = fn;
+    v->builtin = fn;
+    return v;
+}
+
+lval* lval_lambda(lval* formals, lval* body) {
+    lval* v = malloc(sizeof(lval));
+    v->type = LVAL_FN;
+    v->builtin = NULL;
+    v->env = lenv_new();
+    v->formals = formals;
+    v->body = body;
     return v;
 }
 
@@ -59,7 +69,17 @@ lval* lval_copy(lval* v) {
     lval* x = malloc(sizeof(lval));
     x->type = v->type;
     switch(v->type) {
-        case LVAL_FN: x->fn = v->fn; break;
+        case LVAL_FN: 
+            if (!v->builtin) {
+                x->builtin = NULL;
+                // TODO: add lenv_copy
+                x->env = lenv_copy(v->env);
+                x->formals = lval_copy(v->formals);
+                x->body = lval_copy(v->body);
+            } else {
+                x->builtin = v->builtin; break;
+            }
+            break;
         case LVAL_NUM: x->num = v->num; break;
         case LVAL_ERR: LVAL_STRCPY(x, v, err); break;
         case LVAL_OP: LVAL_STRCPY(x, v, op); break;
@@ -93,7 +113,13 @@ void lval_del(lval* v) {
         case LVAL_NUM: break;
         case LVAL_ERR: free(v->err); break;
         case LVAL_OP: free(v->op); break;
-        case LVAL_FN: break;
+        case LVAL_FN: 
+            if (!v->builtin) {
+                lenv_del(v->env);
+                lval_del(v->formals);
+                lval_del(v->body);
+            }
+            break;
         case LVAL_SEXPR:
         case LVAL_QEXPR:
             delete_cells(v);

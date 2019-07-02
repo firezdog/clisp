@@ -75,4 +75,5 @@ void lenv_add_builtins(lenv* e) {
 
     // the most important of the builtins!
     lenv_add_builtin(e, "define", builtin_define);
+    lenv_add_builtin(e, "\\", builtin_lambda);
 }

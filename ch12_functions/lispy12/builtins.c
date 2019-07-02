@@ -36,7 +36,21 @@ lval* builtin_op(lenv* e, lval* a, char* op) {
     lval_del(a); return result;
 }
 
-// seems like we could use macros here also.
+lval* builtin_lambda(lenv* e, lval* a) {
+    BUILTIN_ARG_CHECK(a, 2, "\\", 2, a->cell_count);
+    BUILTIN_TYPE_CHECK(a, 0, "\\", LVAL_QEXPR);
+    BUILTIN_TYPE_CHECK(a, 1, "\\", LVAL_QEXPR);
+    lval* formals_arg = a->cell[0];
+    for (int i = 0; i < formals_arg->cell_count; i++) {
+        // i hope you can store enum entries as ints...
+        int type = formals_arg->cell[i]->type;
+        LASSERT(a, type == LVAL_OP, "Lambda formal must consist of symbols but instead contained %s", return_type(type));
+    }
+    lval* formals = lval_pop(a, 0);
+    lval* body = lval_pop(a, 0);
+    lval_del(a);
+    return lval_lambda(formals, body);
+}
 
 // remember this is taking an s-expression consisting of a q-expression and a series of s-expressions of length equal to the length of the q-expression
 lval* builtin_define(lenv* e, lval* a){

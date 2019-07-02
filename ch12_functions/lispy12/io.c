@@ -6,9 +6,14 @@ void lval_print(lenv* e, lval* v) {
         case(LVAL_ERR)      :   printf("Error: %s", v->err); break;
         case(LVAL_OP)       :   printf("%s", v->op); break; 
         case(LVAL_FN)       :
-            for (int i = 0; i < e->count; i++) {
-                if (e->assignments[i]->fn == v->fn) {
-                    printf("<function> %s", e->variables[i]); break;
+            if (!v->builtin) {
+                printf("\\ "); lval_print(e, v->formals);
+                putchar(' '); lval_print(e, v->body); putchar(')');
+            } else {
+                for (int i = 0; i < e->count; i++) {
+                    if (e->assignments[i]->builtin == v->builtin) {
+                        printf("<function> %s", e->variables[i]); break;
+                    }
                 }
             }
             break;

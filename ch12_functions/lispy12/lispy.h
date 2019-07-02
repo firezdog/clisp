@@ -86,6 +86,7 @@ struct lval {
     struct lval** cell;
     int cell_count;
 };
+lval* lval_lambda(lval* formals, lval* body);
 lval* lval_fn(lbuiltin fn);
 lval* lval_num(double x);
 lval* lval_err(char* format, ...);
@@ -137,6 +138,7 @@ lval* builtin_subtract(lenv* e, lval* a);
 lval* builtin_divide(lenv* e, lval* a);
 lval* builtin_multiply(lenv* e, lval* a);
 lval* builtin_modulus(lenv* e, lval* a);
+lval* builtin_lambda(lenv* e, lval* a);
 lval* builtin_cons(lenv* e, lval* a);
 lval* builtin_head(lenv* e, lval* a);
 lval* builtin_tail(lenv* e, lval* a);
