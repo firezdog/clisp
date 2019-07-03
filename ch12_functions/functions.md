@@ -18,6 +18,10 @@
 * this is allowing user to define lambdas -- we are not yet writing the code to evaluate expressions that contain user defined lambdas
 * we need to check that the first list contains only symbols.  I wonder why there isn't a requirement that the second list contain the same number of symbols as the first?
 # Parent Environment
+* Functions have their own environment (for their bound variable), but they will also have a parent environment they can use to look up any variables that don't appear in their environment.  Parent environments chain (the global environment's parent is NULL)
+* lenv_get will now look in parent environments if it doesn't find what it's looking for in the current environment.
+* now, when we copy an lval, we need to copy its environment as well.
+* defining a variable: we might now be defining a variable in the global environment or in a local environment.  In effect, we'll create a helper function that will walk up to the topmost environment for global definitions.
 # Function Calling
 # Variable Arguments
 # Interesting Functions

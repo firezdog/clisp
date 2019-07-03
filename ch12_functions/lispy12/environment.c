@@ -2,6 +2,7 @@
 
 lenv* lenv_new(void) {
     lenv* v = malloc(sizeof(lenv));
+    v->parent_environment = NULL;
     v->count = 0;
     v->variables = NULL;
     v->assignments = NULL;
@@ -17,6 +18,20 @@ void lenv_del(lenv* v) {
     free(v->variables);
     free(v->assignments);
     free(v);
+}
+
+lenv* lenv_copy(lenv* e) {
+    lenv* c = lenv_new();
+    c->parent_environment = e->parent_environment;
+    c->count = e->count;
+    c->variables = malloc(sizeof(char*) * c->count);
+    c->assignments = malloc(sizeof(lval*) * c->count);
+    for (int i = 0; i < c->count; i++) {
+        c->variables[i] = malloc(strlen(e->variables[i])+1);
+        strcpy(c->variables[i], e->variables[i]);
+        c->assignments[i] = lval_copy(e->assignments[i]);
+    }
+    return c;
 }
 
 void lenv_put(lenv* e, lval* var, lval* asgn) {
@@ -39,12 +54,21 @@ void lenv_put(lenv* e, lval* var, lval* asgn) {
     e->assignments[n - 1] = lval_copy(asgn);
 }
 
+void root_lenv_put(lenv* e, lval* var, lval* asgn) {
+    while (e->parent_environment) {
+        e = e->parent_environment;
+    }
+    lenv_put(e, var, asgn);
+}
+
 lval* lenv_get(lenv* e, lval* var) {
   /* loop through each of variables, find the variable corresponding to a -- using strcmp -- then look up and return the corresponding lval, or else a copy?  Otherwise, return an error stating that the variable is not defined. */
+  // break the recursion
+  if (!e) return lval_err("undefined symbol: %s", var->op);
   for (int i = 0; i < e->count; i++) {
     if (!strcmp(e->variables[i], var->op)) return lval_copy(e->assignments[i]);
   }
-  return lval_err("undefined symbol: %s", var->op);
+  return lenv_get(e->parent_environment, var);
 }
 
 void lenv_add_builtin(lenv* e, char* name, lbuiltin fn) {

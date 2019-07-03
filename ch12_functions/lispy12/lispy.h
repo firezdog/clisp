@@ -104,6 +104,7 @@ struct lenv {
     int count;
     char** variables;
     lval** assignments;
+    lenv* parent_environment;
 };
 lenv* lenv_new(void);
 void lenv_del(lenv* v);
