@@ -25,6 +25,7 @@ lval* lval_num(double x) {
     lval* v = malloc(sizeof(lval));
     v->type = LVAL_NUM;
     v->num = x;
+    v->builtin = NULL;
     return v;
 }
 
@@ -37,6 +38,7 @@ lval* lval_err(char* format, ...) {
     vsnprintf(v->err, 511, format, args);
     v->err = realloc(v->err, strlen(v->err) + 1);
     va_end(args);
+    v->builtin = NULL;
     return v;
 }
 
@@ -45,6 +47,7 @@ lval* lval_op(char* op) {
     v->type = LVAL_OP;
     v->op = malloc(strlen(op) + 1);
     strcpy(v->op, op);
+    v->builtin = NULL;
     return v;
 }
 
@@ -53,12 +56,14 @@ lval* lval_sexpr() {
     v->type = LVAL_SEXPR;
     v->cell_count = 0;
     v->cell = NULL;
+    v->builtin = NULL;
     return v;
 }
 
 lval* lval_qexpr() {
     lval* v = lval_sexpr();
     v->type = LVAL_QEXPR;
+    v->builtin = NULL;
     return v;
 }
 #pragma endregion

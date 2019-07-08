@@ -21,8 +21,11 @@
 * Functions have their own environment (for their bound variable), but they will also have a parent environment they can use to look up any variables that don't appear in their environment.  Parent environments chain (the global environment's parent is NULL)
 * lenv_get will now look in parent environments if it doesn't find what it's looking for in the current environment.
 * now, when we copy an lval, we need to copy its environment as well.
-* defining a variable: we might now be defining a variable in the global environment or in a local environment.  In effect, we'll create a helper function that will walk up to the topmost environment for global definitions.
+* defining a variable: we might now be defining a variable in the global environment or in a local environment.  In effect, we'll create a helper function that will walk up to the topmost environment for global definitions. Then, we'll change builtin_define so that it accepts a flag for global or local definitions.
 # Function Calling
+* lval_call will be our builtin function caller. It will perform the following steps:
+  1. Bind variables formals
+  2. evaulate the body using the environment
 # Variable Arguments
 # Interesting Functions
 ## Function Definition

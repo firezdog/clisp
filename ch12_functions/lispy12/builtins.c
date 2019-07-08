@@ -53,7 +53,7 @@ lval* builtin_lambda(lenv* e, lval* a) {
 }
 
 // remember this is taking an s-expression consisting of a q-expression and a series of s-expressions of length equal to the length of the q-expression
-lval* builtin_define(lenv* e, lval* a){
+lval* define_variable(lenv* e, lval* a, char* func){
     // the arguments are the cells of "a"
     BUILTIN_TYPE_CHECK(a, 0, "define", LVAL_QEXPR);
     lval* symbols = a->cell[0];
@@ -71,11 +71,20 @@ lval* builtin_define(lenv* e, lval* a){
     int argumentParity = nSyms + 1 == a->cell_count;
     LASSERT(a, argumentParity, "<define>: list of definiens and series of definienda must be of equal length.");
     for (int i = 0; i < symbols->cell_count; i++) {
-        lenv_put(e, symbols->cell[i], a->cell[i + 1]);
+        if (!strcmp(func, "def")) root_lenv_put(e, symbols->cell[i], a->cell[i + 1]);
+        if (!strcmp(func, "let")) lenv_put(e, symbols->cell[i], a->cell[i+1]);
     }
     lval_del(a);
     // the empty expression
     return lval_sexpr();
+}
+
+lval* builtin_let(lenv* e, lval* a) {
+    return define_variable(e, a, "let");
+}
+
+lval* builtin_def(lenv* e, lval* a) {
+    return define_variable(e, a, "def");
 }
 
 lval* builtin_add(lenv* e, lval* a) {
