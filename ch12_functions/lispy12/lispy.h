@@ -27,7 +27,7 @@ void add_history(char* unused) {}
 #else
 // compile with flag "-ledit"
 // #include <editline/history.h> // not needed on mac
-#include <editline/readline.h>
+#include <editline.h>
 #endif
 #pragma endregion
 
