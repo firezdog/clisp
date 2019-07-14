@@ -35,10 +35,8 @@ lenv* lenv_copy(lenv* e) {
 }
 
 void lenv_put(lenv* e, lval* var, lval* asgn) {
-    /* puts a new value in the environment dictionary.  First, loop through and check if it is in the dictionary.  If so, delete the corresponding value and put the new one in.  If not, add it to the variables list, then add the corresponding assignment. 
-    
-    Note: here we put a copy in rather than the processed input itself -- presumably because the input is always getting deleted after the end of processing?
-    */
+    /* puts a new value in an environment dictionary. Note: here we put a copy in rather than the processed input itself -- presumably because the input is always getting deleted after the end of processing */
+   // A. If the variable is already in the env, replace its assignment with the new value
     for (int i = 0; i < e->count; i++) {
         if (!strcmp(e->variables[i], var->op)) { 
             lval_del(e->assignments[i]);
@@ -46,6 +44,7 @@ void lenv_put(lenv* e, lval* var, lval* asgn) {
             return; 
         }
     }
+    // B. Otherwise, add it and its assignment to the environment.
     int n = ++e->count;
     e->variables = realloc(e->variables, sizeof(char*) * n);
     e->assignments = realloc(e->assignments, sizeof(lval*) * n);
@@ -98,6 +97,7 @@ void lenv_add_builtins(lenv* e) {
     lenv_add_builtin(e, "exit", builtin_exit);
 
     // the most important of the builtins!
-    lenv_add_builtin(e, "define", builtin_define);
+    lenv_add_builtin(e, "def", builtin_def);
+    lenv_add_builtin(e, "let", builtin_let);
     lenv_add_builtin(e, "\\", builtin_lambda);
 }

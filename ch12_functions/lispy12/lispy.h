@@ -34,14 +34,15 @@ void add_history(char* unused) {}
 #pragma region macros
 // (lval, int, string, enum) => lval
 #define BUILTIN_TYPE_CHECK(value, arg, function, _type) \
-    lval* item = value->cell[arg]; \
-    if(!(item->type == _type)) \
-        { \
-            lval* e = lval_err("%s requires an argument of type [%s] but got an argument of type [%s]", \
-            function, return_type(_type), return_type(item->type)); \
-            lval_del(value); \
-            return e; \
-        }
+{ lval* item = value->cell[arg]; \
+    if(!(value->cell[arg]->type == _type)) \
+    { \
+        lval* e = lval_err("%s requires an argument of type [%s] but got an argument of type [%s]", \
+        function, return_type(_type), return_type(value->cell[arg]->type)); \
+        lval_del(value); \
+        return e; \
+    } \
+}
 #define LASSERT(args, cond, err, ...) \
     if(!(cond)) { lval_del(args); return lval_err(err, ##__VA_ARGS__); }
 
@@ -109,6 +110,8 @@ struct lenv {
 lenv* lenv_new(void);
 void lenv_del(lenv* v);
 void lenv_put(lenv* e, lval* var, lval* asgn);
+void root_lenv_put(lenv* e, lval* var, lval* asgn);
+lenv* lenv_copy(lenv* e);
 lval* lenv_get(lenv* e, lval* var);
 void lenv_add_builtin(lenv* e, char* name, lbuiltin fn);
 void lenv_add_builtins(lenv* e);
@@ -132,14 +135,18 @@ int check_div_0(double x);
 #pragma endregion
 
 #pragma region builtins
+// computation
 lval* builtin_op(lenv* e, lval* a, char* op);
 lval* builtin_add(lenv* e, lval* a);
-lval* builtin_define(lenv* e, lval* a);
 lval* builtin_subtract(lenv* e, lval* a);
 lval* builtin_divide(lenv* e, lval* a);
 lval* builtin_multiply(lenv* e, lval* a);
 lval* builtin_modulus(lenv* e, lval* a);
+// variables
 lval* builtin_lambda(lenv* e, lval* a);
+lval* builtin_def(lenv* e, lval* a);
+lval* builtin_let(lenv* e, lval* a);
+// list operations
 lval* builtin_cons(lenv* e, lval* a);
 lval* builtin_head(lenv* e, lval* a);
 lval* builtin_tail(lenv* e, lval* a);
@@ -148,10 +155,13 @@ lval* builtin_eval(lenv* e, lval* a);
 lval* builtin_join(lenv* e, lval* a);
 lval* builtin_init(lenv* e, lval* a);
 lval* builtin_len(lenv* e, lval* a);
-lval* lval_join(lval* x, lval* y);
-lval* builtin(lenv* e, lval* a, char* func);
+// utilities
 lval* builtin_print_env(lenv* e, lval* v);
 lval* builtin_exit(lenv* e, lval* v);
+// helpers
+lval* define_variable(lenv* e, lval* a, char* func);
+lval* lval_join(lval* x, lval* y);
+lval* builtin(lenv* e, lval* a, char* func);
 #pragma endregion
 
 #pragma region grammar
