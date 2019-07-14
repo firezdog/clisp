@@ -87,6 +87,7 @@ struct lval {
     struct lval** cell;
     int cell_count;
 };
+lval* lval_call(lenv* e, lval* f, lval* a);
 lval* lval_lambda(lval* formals, lval* body);
 lval* lval_fn(lbuiltin fn);
 lval* lval_num(double x);

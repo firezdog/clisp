@@ -21,8 +21,10 @@ lval* lval_eval_sexpr(lenv* e, lval* v) {
         return lval_err("S-expression must start with a function.");
     }
     // if it is a symbol, run its callback on v to evaluate
-    lval* result = f->builtin(e, v);
-    lval_del(f);
+    lval* result;
+    // if (f->builtin != NULL) { result = f->builtin(e, v); }
+    result = lval_call(e, f, v); 
+    // lval_del(f); lval_del(v);
     return result;
 }
 

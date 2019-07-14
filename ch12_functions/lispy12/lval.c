@@ -69,6 +69,26 @@ lval* lval_qexpr() {
 #pragma endregion
 
 #pragma region helpers
+lval* lval_call(lenv* e, lval* f, lval* a) {
+/* Given a function, an lval with assignments, and an environment, call the function with those assignments in that environment.*/
+// This talk of "calling a function" is slightly misleading -- what we're really doing is generating a complete s-expression from the values given and the function schema, then evaluating the schema.  So if the function is {+ x y} and the values are (3, 4), we generate {+ 3 4} and evalute it, returning (7).    
+    if (f->builtin) { return f->builtin(e, a); }
+    // in the function's environment, match up each assignment from a with one of the function's formals 
+    for (int i = 0; i < a->cell_count; i++) {
+        lenv_put(f->env, f->formals->cell[i], a->cell[i]);
+    }
+    lval_del(a);
+    f->env->parent_environment = e;
+    // evaluate the function (an expression) using the variables in its environment and then parent environments
+    return builtin_eval(
+        f->env, 
+        lval_add(
+            lval_sexpr(), 
+            lval_copy(f->body)
+        )
+    );
+}
+
 // copy an lval
 lval* lval_copy(lval* v) {
     lval* x = malloc(sizeof(lval));

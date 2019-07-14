@@ -1,4 +1,4 @@
-cc \
+gcc \
   builtins.c \
   environment.c \
   evaluation.c \
@@ -7,5 +7,5 @@ cc \
   lispy.c \
   lval.c \
   mpc_library/mpc.c \
-  -ledit \
+  -leditline \
   -g
