@@ -89,7 +89,7 @@ lval* lval_call(lenv* e, lval* f, lval* a) {
     );
 }
 
-// copy an lval
+// copy an lval.
 lval* lval_copy(lval* v) {
     lval* x = malloc(sizeof(lval));
     x->type = v->type;
