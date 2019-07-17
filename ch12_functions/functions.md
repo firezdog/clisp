@@ -34,7 +34,11 @@
 * {x & xs} will take a single argument x and join additional arguments into a list called xs -- i.e. the additional arguments will be assigned to a list and stored in "xs"
   1. we need to convert the arguments after the first into a q-expression
   2. & must be followed by a symbol, if not throw an error
-* I had a loop to slowly fill up the new list of arguments; orangeduck just uses builtin_list, converting the rest of "a" into a q_expr and putting it into the env directly.  Then he breaks because there's nothing left to do with "a".
+* I had a loop to slowly fill up the new list of arguments; orangeduck just uses builtin_list, converting the rest of "a" into a q_expr and putting it into the env directly.  Then he breaks because there's nothing left to do with "a".  Tried to test my solution, not sure it really works.
+* It seems weird -- a function can be defined with an improper format and the interpreter does not stop us.
+* my program was crashing because I was not deleting the param (?) / also I created a separate variable for builtin_list(e, a).  Not sure why.
+  * doesn't seem like variable for builtin_list was a problem -- but deleting the variable was.  I thought maybe it would be because then environment isn't pointing to anything -- but no, because env points to a copy.  Maybe it's because builtin_list just makes "a" into a q_expr and returns it.  So if I delete it, there's nothing to delete later. That seems right, because if I comment out that line, there's no crash (though i guess there might be a memory leak?)
+  * above shows why it MIGHT not be a good idea to store builtin_list
 # Interesting Functions
 ## Function Definition
 ## Currying

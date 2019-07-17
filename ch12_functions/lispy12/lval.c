@@ -86,16 +86,11 @@ lval* lval_call(lenv* e, lval* f, lval* a) {
         lval* param = lval_pop(f->formals, 0);
         // handle extra arguments -- not the symbol following and is the last symbol that can be defined
         if (!strcmp(param->op, "&")) {
-            LASSERT(f->formals, f->formals->cell_count == 1, "'&' symbol must be followed by one argument naming the list of variable arguments");
+            LASSERT(a, f->formals->cell_count == 1, "Function format invalid: '&' symbol must be followed by one argument naming the list of variable arguments");
             lval* arg_list_param = lval_pop(f->formals, 0);
-            lval* arg_list = lval_qexpr();
-            while (a->cell_count) {
-                lval* next_arg = lval_pop(a, 0);
-                lval_add(arg_list, next_arg);
-                lval_del(next_arg);
-            }
-            lenv_put(e, arg_list_param, arg_list);
-            lval_del(arg_list_param); lval_del(arg_list);
+            lenv_put(e, arg_list_param, builtin_list(e, a));
+            lval_del(arg_list_param); lval_del(param);
+            break;
         } else {
             // a->cell_count decreases by one
             lval* arg = lval_pop(a, 0);
