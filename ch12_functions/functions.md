@@ -30,6 +30,11 @@
 * we still have an issue: what if the function is supplied with too few / too many arguments on call?  Naive implementation causes crash
 * we could return a partially bound function (i.e. another function)
 # Variable Arguments
+* use a special symbol (&) for extra variables at the end of a function call
+* {x & xs} will take a single argument x and join additional arguments into a list called xs -- i.e. the additional arguments will be assigned to a list and stored in "xs"
+  1. we need to convert the arguments after the first into a q-expression
+  2. & must be followed by a symbol, if not throw an error
+* I had a loop to slowly fill up the new list of arguments; orangeduck just uses builtin_list, converting the rest of "a" into a q_expr and putting it into the env directly.  Then he breaks because there's nothing left to do with "a".
 # Interesting Functions
 ## Function Definition
 ## Currying
