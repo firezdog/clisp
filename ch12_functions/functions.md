@@ -39,6 +39,7 @@
 * my program was crashing because I was not deleting the param (?) / also I created a separate variable for builtin_list(e, a).  Not sure why.
   * doesn't seem like variable for builtin_list was a problem -- but deleting the variable was.  I thought maybe it would be because then environment isn't pointing to anything -- but no, because env points to a copy.  Maybe it's because builtin_list just makes "a" into a q_expr and returns it.  So if I delete it, there's nothing to delete later. That seems right, because if I comment out that line, there's no crash (though i guess there might be a memory leak?)
   * above shows why it MIGHT not be a good idea to store builtin_list
+* we are going to have to add error checking or the program will crash when the user calls with more arguments than are required -- but it's tricky, because this is only a problem if & is not included in the function def
 # Interesting Functions
 ## Function Definition
 ## Currying
