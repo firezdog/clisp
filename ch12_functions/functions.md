@@ -27,6 +27,8 @@
 * lval_call will be our builtin function caller. It will perform the following steps:
   1. Bind variables formals
   2. evaulate the body using the environment
+* we still have an issue: what if the function is supplied with too few / too many arguments on call?  Naive implementation causes crash
+* we could return a partially bound function (i.e. another function)
 # Variable Arguments
 # Interesting Functions
 ## Function Definition

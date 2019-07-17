@@ -73,20 +73,36 @@ lval* lval_call(lenv* e, lval* f, lval* a) {
 /* Given a function, an lval with assignments, and an environment, call the function with those assignments in that environment.*/
 // This talk of "calling a function" is slightly misleading -- what we're really doing is generating a complete s-expression from the values given and the function schema, then evaluating the schema.  So if the function is {+ x y} and the values are (3, 4), we generate {+ 3 4} and evalute it, returning (7).    
     if (f->builtin) { return f->builtin(e, a); }
-    // in the function's environment, match up each assignment from a with one of the function's formals 
-    for (int i = 0; i < a->cell_count; i++) {
-        lenv_put(f->env, f->formals->cell[i], a->cell[i]);
+    // how many arguments are required and how many were supplied? -- used for error handling only
+    int args_required = f->formals->cell_count;
+    int args_supplied = a->cell_count;
+    // repeatedly evaluate function by applying arguments in order
+    while (a->cell_count) {
+        // case: the function is completely bound but there are still arguments in the queue
+        if (f->formals->cell_count == 0) {
+            lval_del(a);
+            return lval_err("Function passed too many arguments: got %s, expected %s", args_supplied, args_required);
+        }
+        lval* param = lval_pop(f->formals, 0);
+        // a->cell_count decreases by one
+        lval* arg = lval_pop(a, 0);
+        lenv_put(f->env, param, arg);
+        lval_del(param); lval_del(arg);
     }
     lval_del(a);
     f->env->parent_environment = e;
-    // evaluate the function (an expression) using the variables in its environment and then parent environments
-    return builtin_eval(
-        f->env, 
-        lval_add(
-            lval_sexpr(), 
-            lval_copy(f->body)
-        )
-    );
+    // only evaluate if all formals have been bound
+    if (f->formals->cell_count == 0) {
+        // evaluate the function (an expression) using the variables in its environment and then parent environments
+        return builtin_eval(
+            f->env, 
+            lval_add(
+                lval_sexpr(), 
+                lval_copy(f->body)
+            )
+        );
+    }
+    return lval_copy(f);
 }
 
 // copy an lval.
