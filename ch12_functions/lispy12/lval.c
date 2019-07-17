@@ -89,18 +89,28 @@ lval* lval_call(lenv* e, lval* f, lval* a) {
             LASSERT(a, f->formals->cell_count == 1, "Function format invalid: '&' symbol must be followed by one argument naming the list of variable arguments");
             lval* arg_list_param = lval_pop(f->formals, 0);
             lenv_put(e, arg_list_param, builtin_list(e, a));
-            lval_del(arg_list_param); lval_del(param);
+            lval_del(arg_list_param); 
             break;
         } else {
             // a->cell_count decreases by one
             lval* arg = lval_pop(a, 0);
             lenv_put(f->env, param, arg);
-            lval_del(param); lval_del(arg);
+            lval_del(arg);
         }
+        lval_del(param);
     }
     lval_del(a);
-    f->env->parent_environment = e;
     // only evaluate if all formals have been bound
+    if (f->formals->cell_count > 0 && !strcmp(f->formals->cell[0]->op, "&")) {
+        lval_del(lval_pop(f->formals, 0));
+        LASSERT(NULL, f->formals->cell_count == 1,  "Function format invalid: '&' symbol must be followed by one argument naming the list of variable arguments");
+        lval* param = lval_pop(f->formals, 0);
+        // declare it so we can then cleanup below.
+        lval* arg = lval_qexpr();
+        lenv_put(f->env, param, arg);
+        lval_del(param); lval_del(arg);
+    }
+    f->env->parent_environment = e;
     if (f->formals->cell_count == 0) {
         // evaluate the function (an expression) using the variables in its environment and then parent environments
         return builtin_eval(
@@ -122,7 +132,6 @@ lval* lval_copy(lval* v) {
         case LVAL_FN: 
             if (!v->builtin) {
                 x->builtin = NULL;
-                // TODO: add lenv_copy
                 x->env = lenv_copy(v->env);
                 x->formals = lval_copy(v->formals);
                 x->body = lval_copy(v->body);
