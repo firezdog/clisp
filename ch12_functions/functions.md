@@ -42,6 +42,7 @@
 * we are going to have to add error checking or the program will crash when the user calls with more arguments than are required -- but it's tricky, because this is only a problem if & is not included in the function def
 * CASE: user doesn't supply extra arguments -- set extra args to empty list -- note -- this happens after we've run through all the a->cell's
 # Interesting Functions
+## Function Definition
 * Problem: it's hard to define functions -- solution: write a lambda expression that will define new lambda expressions
   * user supplies name and formal arguments in one list (as well as definition?)
   * fact: the head of the list will be the name of the function, the tail with be the args.
@@ -57,6 +58,7 @@
         * the definition then gets a lambda -- 
           * its list of args is the rest of the signature.
           * its expression is the body from the original definition (which is a list w/ expression)
+## (Un)Currying
 * Problem: "+" can take multiple args -- but what if we passed it args as a list?
   * Solution: add "+" to the list and use eval e.g.
     * eval (join {+} {1 2 3 4 5})
@@ -73,5 +75,10 @@
       * supply head 1 2 3 4 5 => {1}
       * supply tail 1 2 3 4 5 => {2 3 4 5}
 * This is called *currying* and *uncurrying* -- after Haskell Curry
-## Function Definition
-## Currying
+## Others
+* Get the first element in a list:
+  * def {first} (\ {list} {eval (head list)})
+* Get the second element in a list:
+  * def {second} (\ {list} {first (head (tail list))})
+* get the sum of the first two elements in a list :)
+  * def {add-one-two} (\ {list} { + (first(list)) (second(list)) })
