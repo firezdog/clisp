@@ -42,5 +42,36 @@
 * we are going to have to add error checking or the program will crash when the user calls with more arguments than are required -- but it's tricky, because this is only a problem if & is not included in the function def
 * CASE: user doesn't supply extra arguments -- set extra args to empty list -- note -- this happens after we've run through all the a->cell's
 # Interesting Functions
+* Problem: it's hard to define functions -- solution: write a lambda expression that will define new lambda expressions
+  * user supplies name and formal arguments in one list (as well as definition?)
+  * fact: the head of the list will be the name of the function, the tail with be the args.
+  * def {func} (\ {signature body} {def (head signature) (\ (tail signature) body)})
+    * e.g. func {add x y} {+ x y}
+    * Why does this work?
+      * def {func} (\ {x_0, x_1, ..., x_n} {/<x_0, x_1, ..., x_n...>})
+      * we have a lambda followed by two lists -- a list of args and a list of an expression containing those args -- that is the requirement
+      * so we have to show that the above call to lambda provides a list of args and a list of an expression containing those args -- and that ultimately it EVALUATES to the def. of a function.
+      * the list of args is the function signature and body.
+      * the expression containing them is a definition -- (inception style)
+        * the definition gets the head of the signature, which is the function name, as its first argument
+        * the definition then gets a lambda -- 
+          * its list of args is the rest of the signature.
+          * its expression is the body from the original definition (which is a list w/ expression)
+* Problem: "+" can take multiple args -- but what if we passed it args as a list?
+  * Solution: add "+" to the list and use eval e.g.
+    * eval (join {+} {1 2 3 4 5})
+  * or generally we could have a function apply:
+    * def {apply} (\ {func args} {eval (join func args)})
+      * e.g. apply {+} {1 2 3 4 5} => 15
+      * a slight improvement:
+        * def {apply} (\ {func args} {eval (join (list func) args)})
+          * e.g. apply + {1 2 3 4 5} => 15
+* Above -- we had a function that doesn't take a list but we wanted to call it with a list.
+  * What if we have a function that does take a list but we want to call it without a list?
+  * def {supply} (\ {func & args} {func args})
+    * e.g. 
+      * supply head 1 2 3 4 5 => {1}
+      * supply tail 1 2 3 4 5 => {2 3 4 5}
+* This is called *currying* and *uncurrying* -- after Haskell Curry
 ## Function Definition
 ## Currying
