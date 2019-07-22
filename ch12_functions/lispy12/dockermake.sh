@@ -1,6 +1,5 @@
 gcc \
   -std=c99 \
-  -g \
   builtins.c \
   environment.c \
   evaluation.c \
@@ -9,4 +8,5 @@ gcc \
   lispy.c \
   lval.c \
   mpc_library/mpc.c \
-  -ledit \
+  -leditline \
+  -g
