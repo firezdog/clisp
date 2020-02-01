@@ -9,12 +9,11 @@ void invoke_callback(int range, void (*callback_for_int) (int))
     }
 }
 
-void callback(int x)
-{
-    printf("%d\n", x);
-}
-
 void main()
 {
+    void callback(int x)
+    {
+        printf("%d\n", x);
+    }
     invoke_callback(10, callback);
 }
