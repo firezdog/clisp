@@ -22,9 +22,7 @@ lval* lval_eval_sexpr(lenv* e, lval* v) {
     }
     // if it is a symbol, run its callback on v to evaluate
     lval* result;
-    // if (f->builtin != NULL) { result = f->builtin(e, v); }
     result = lval_call(e, f, v); 
-    // lval_del(f); lval_del(v);
     return result;
 }
 
@@ -69,5 +67,5 @@ lval* lval_join(lval* x, lval* y) {
 }
 
 int check_div_0(double x) {
-    return x == 0 ? 1 : 0;
+    return x == 0;
 }
