@@ -24,10 +24,11 @@ char* readline(char* prompt) {
 }
 /* Fake add_history function -- not needed in windows implementation */
 void add_history(char* unused) {}
-#else
+#elif defined(__linux__)
 // compile with flag "-ledit"
-// #include <editline/history.h> // not needed on mac
-// #include <editline/readline.h> // for Mac and some Linux
+#include <editline/readline.h> // for Mac and some Linux
+#else
+#include <editline/history.h> // not needed on mac
 #include <editline.h> // otherwise try <editline.h>
 #endif
 #pragma endregion
