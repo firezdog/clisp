@@ -1,21 +1,12 @@
-#define LAMBDA(type_) ({\
-    type_ _; \
-})
-
 #include<stdio.h>
 
-void invoke_callback(int range, int (*callback_for_int) (int)) 
-{
-    for (int i = 0; i < range; i++)
-    {
-        printf("%d\n", callback_for_int(i));
-    }
-}
+#define lambda(type, body) \
+({ \
+    type __fn__ body \
+        __fn__; \
+})
 
-void main()
-{
-    invoke_callback(
-        10, 
-        LAMBDA(int _(int n) { printf("%d\n", n); return n; })
-    );
+void main() {
+    void(*say_hello)(char*) = lambda(void, (char* str) { printf("Hello %s\n", str); });
+    say_hello("world");
 }
