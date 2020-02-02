@@ -11,9 +11,14 @@ void invoke_callback(int range, void (*callback_for_int) (int))
 
 void main()
 {
-    void callback(int x) 
-    { 
-        printf("%d\n", x); 
-    }
-    invoke_callback(10, callback);
+    invoke_callback(
+        10,
+        ({
+            void callback(int n) 
+            { 
+                printf("%d\n", n); 
+            } 
+            callback; 
+        })
+    );
 }
