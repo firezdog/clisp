@@ -84,7 +84,11 @@ void lenv_add_builtins(lenv* e) {
     lenv_add_builtin(e, "*", builtin_multiply);
     lenv_add_builtin(e, "%", builtin_modulus);
 
-    lenv_add_builtin(e, "=", builtin_equals);
+    // logic and comparison
+    lenv_add_builtin(e, ">", builtin_greater);
+    lenv_add_builtin(e, "<", builtin_lesser);
+    lenv_add_builtin(e, "or", builtin_or);
+    lenv_add_builtin(e, "and", builtin_and);
 
     lenv_add_builtin(e, "cons", builtin_cons);
     lenv_add_builtin(e, "head", builtin_head);

@@ -198,13 +198,21 @@ lval* builtin_exit(lenv* e, lval* v) {
     return lval_sexpr();
 }
 
-lval* builtin_equals(lenv* e, lval* a)
-{
-        BUILTIN_ARG_CHECK(a, 2, "=", 2, a->cell_count);
-        BUILTIN_TYPE_CHECK(a, 0, "=", LVAL_NUM);
-        BUILTIN_TYPE_CHECK(a, 1, "=", LVAL_NUM);
-        lval* comp_a = lval_pop(a, 0);
-        lval* comp_b = lval_pop(a, 0);  // remember that 0 is the head of the list.
-        if (comp_a->num == comp_b->num) return lval_num(1);
-        return lval_num(0);
+# define TWO_PLACE_RELATION(name, symbol, operator)\
+lval* name(lenv* e, lval* a)\
+{\
+    BUILTIN_ARG_CHECK(a, 2, symbol, 2, a->cell_count);\
+    BUILTIN_TYPE_CHECK(a, 0, symbol, LVAL_NUM);\
+    BUILTIN_TYPE_CHECK(a, 1, symbol, LVAL_NUM);\
+    lval* comp_a = lval_pop(a, 0);\
+    lval* comp_b = lval_pop(a, 0);\
+    if (comp_a->num operator comp_b->num) return lval_num(1);\
+    return lval_num(0);\
 }
+
+TWO_PLACE_RELATION(builtin_greater, ">", >)
+TWO_PLACE_RELATION(builtin_lesser, "<", <)
+TWO_PLACE_RELATION(builtin_or, "or", ||);
+TWO_PLACE_RELATION(builtin_and, "and", &&);
+
+// TODO: define "not" and "=" -- the tricky ones, because they are not limited to numerals
