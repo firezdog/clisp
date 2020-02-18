@@ -150,6 +150,8 @@ lval* builtin_or(lenv* e, lval* a);
 lval* builtin_and(lenv* e, lval* a);
 lval* builtin_greater(lenv* e, lval* a);
 lval* builtin_lesser(lenv* e, lval* a);
+lval* builtin_not(lenv* e, lval* a);
+lval* builtin_equals(lenv* e, lval* a);
 // variables
 lval* builtin_lambda(lenv* e, lval* a);
 lval* builtin_def(lenv* e, lval* a);
@@ -170,6 +172,7 @@ lval* builtin_exit(lenv* e, lval* v);
 lval* define_variable(lenv* e, lval* a, char* func);
 lval* lval_join(lval* x, lval* y);
 lval* builtin(lenv* e, lval* a, char* func);
+int lvals_equal(lval* comp_a, lval* comp_b);
 #pragma endregion
 
 #pragma region grammar

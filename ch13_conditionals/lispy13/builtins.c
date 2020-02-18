@@ -206,13 +206,66 @@ lval* name(lenv* e, lval* a)\
     BUILTIN_TYPE_CHECK(a, 1, symbol, LVAL_NUM);\
     lval* comp_a = lval_pop(a, 0);\
     lval* comp_b = lval_pop(a, 0);\
-    if (comp_a->num operator comp_b->num) return lval_num(1);\
+    lval_del(a);\
+    double comp_a_num = comp_a->num;\
+    double comp_b_num = comp_b->num;\
+    lval_del(comp_a); lval_del(comp_b);\
+    if (comp_a_num operator comp_b_num) return lval_num(1);\
     return lval_num(0);\
 }
 
 TWO_PLACE_RELATION(builtin_greater, ">", >)
 TWO_PLACE_RELATION(builtin_lesser, "<", <)
+
+// TODO: apply to non-numbers?
 TWO_PLACE_RELATION(builtin_or, "or", ||);
 TWO_PLACE_RELATION(builtin_and, "and", &&);
 
-// TODO: define "not" and "=" -- the tricky ones, because they are not limited to numerals
+// (not x) returns 1 iff x is 0 
+// TODO: how do you apply this to non-numerical expressions?
+lval* builtin_not(lenv* e, lval* a)
+{
+    BUILTIN_ARG_CHECK(a, 1, "!", 1, a->cell_count);
+    BUILTIN_TYPE_CHECK(a, 0, "!", LVAL_NUM);
+    lval* value = lval_pop(a, 0);
+    double value_num = value->num;
+    lval_del(a);
+    lval_del(value);
+    if (value_num == 0) {
+        return lval_num(1);
+    }
+    return lval_num(0);
+}
+
+// strategy for equals: a == b if (1) they have the same type and (2) their fields are equal (recursion)
+lval* builtin_equals(lenv* e, lval* a)
+{
+    BUILTIN_ARG_CHECK(a, 2, "=", 2, a->cell_count);
+    lval* comp_a = lval_pop(a, 0);
+    lval* comp_b = lval_pop(a, 0);
+    lval* result = lval_num(lvals_equal(comp_a, comp_b));
+    lval_del(comp_a); lval_del(comp_b);
+    return result;
+}
+
+int lvals_equal(lval* comp_a, lval* comp_b)
+{
+    if (comp_a->type != comp_b->type) return 0;
+    
+    switch (comp_a->type) 
+    {
+        case LVAL_NUM: return (comp_a->num == comp_b->num);
+        case LVAL_ERR: return (!strcmp(comp_a->err, comp_b->err));
+        // used for evaluating whether symbols in the body of an expression are the same
+        case LVAL_OP: return (!strcmp(comp_a->op, comp_b->op));
+        // this depends on equality being defined for q-expr
+        case LVAL_FN:
+            if (comp_a->builtin || comp_b->builtin) return (comp_a->builtin == comp_b->builtin);
+            else return 
+                lvals_equal(comp_a->formals, comp_b->formals) && 
+                lvals_equal(comp_a->body, comp_b->body);
+        break;
+        // TODO: q-expr and s-expr
+    }
+    return 0;
+}
