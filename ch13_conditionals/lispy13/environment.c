@@ -65,7 +65,9 @@ lval* lenv_get(lenv* e, lval* var) {
   // break the recursion
   if (!e) return lval_err("undefined symbol: %s", var->op);
   for (int i = 0; i < e->count; i++) {
-    if (!strcmp(e->variables[i], var->op)) return lval_copy(e->assignments[i]);
+    if (!strcmp(e->variables[i], var->op)) {
+        return lval_copy(e->assignments[i]);
+    }
   }
   return lenv_get(e->parent_environment, var);
 }
@@ -91,6 +93,7 @@ void lenv_add_builtins(lenv* e) {
     lenv_add_builtin(e, "and", builtin_and);
     lenv_add_builtin(e, "!", builtin_not);
     lenv_add_builtin(e, "=", builtin_equals);
+    lenv_add_builtin(e, "?", builtin_ternary);
 
     lenv_add_builtin(e, "cons", builtin_cons);
     lenv_add_builtin(e, "head", builtin_head);

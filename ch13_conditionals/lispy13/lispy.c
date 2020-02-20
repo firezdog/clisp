@@ -9,7 +9,7 @@ int main(int argc, char** argv) {
     
     // prompt
     puts("Lispy");
-    puts("Press Ctrl+c to Exit\n");
+    puts("Press Ctrl+c to exit or type exit()\n");
     
     while (run_lisp) {
         input = readline("lispy> ");

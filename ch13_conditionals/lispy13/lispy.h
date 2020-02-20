@@ -145,13 +145,14 @@ lval* builtin_subtract(lenv* e, lval* a);
 lval* builtin_divide(lenv* e, lval* a);
 lval* builtin_multiply(lenv* e, lval* a);
 lval* builtin_modulus(lenv* e, lval* a);
-//comparison
+//comparison and logic
 lval* builtin_or(lenv* e, lval* a);
 lval* builtin_and(lenv* e, lval* a);
 lval* builtin_greater(lenv* e, lval* a);
 lval* builtin_lesser(lenv* e, lval* a);
 lval* builtin_not(lenv* e, lval* a);
 lval* builtin_equals(lenv* e, lval* a);
+lval* builtin_ternary(lenv* e, lval* a);
 // variables
 lval* builtin_lambda(lenv* e, lval* a);
 lval* builtin_def(lenv* e, lval* a);

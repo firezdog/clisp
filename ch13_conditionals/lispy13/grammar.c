@@ -3,7 +3,7 @@
 void define_grammar(mpc_parser_t* Numeral, mpc_parser_t* Operator, mpc_parser_t* Sexpr, mpc_parser_t* Qexpr, mpc_parser_t* Expr, mpc_parser_t* Lispy) {
     mpca_lang(MPCA_LANG_DEFAULT,
     "numeral: /-?([0-9]*\\.)?[0-9]+/ ;\
-    operator: /[a-zA-Z0-9_+\\-*\\/\\\\=<>!&%]+/ ;\
+    operator: /[a-zA-Z0-9_+\\-*\\/\\\\=<>!&%?]+/ ;\
     sexpr: '(' <expr>* ')' ;\
     qexpr: '{' <expr>* '}' ;\
     expr: <numeral> | <operator> | <sexpr> | <qexpr> ;\

@@ -238,6 +238,7 @@ lval* builtin_not(lenv* e, lval* a)
 }
 
 // strategy for equals: a == b if (1) they have the same type and (2) their fields are equal (recursion)
+// we don't need a != because we have a not operator
 lval* builtin_equals(lenv* e, lval* a)
 {
     BUILTIN_ARG_CHECK(a, 2, "=", 2, a->cell_count);
@@ -264,8 +265,32 @@ int lvals_equal(lval* comp_a, lval* comp_b)
             else return 
                 lvals_equal(comp_a->formals, comp_b->formals) && 
                 lvals_equal(comp_a->body, comp_b->body);
+        case LVAL_QEXPR:
+        case LVAL_SEXPR:
+            if (comp_a->cell_count != comp_b->cell_count) return 0;
+            for (int i = 0; i < comp_a->cell_count; i++) {
+                if (!lvals_equal(comp_a->cell[i], comp_b->cell[i])) return 0;
+            }
+            return 1;
         break;
-        // TODO: q-expr and s-expr
     }
     return 0;
+}
+
+// functions like a ternary operator -- takes 3 q-expression -- the condition, path true, and path false
+lval* builtin_ternary(lenv* e, lval* a)
+{
+    BUILTIN_ARG_CHECK(a, 3, "?", 3, a->cell_count);
+    BUILTIN_TYPE_CHECK(a, 0, "?", LVAL_NUM);
+    BUILTIN_TYPE_CHECK(a, 1, "?", LVAL_QEXPR);
+    BUILTIN_TYPE_CHECK(a, 1, "?", LVAL_QEXPR);
+    
+    double condition = a->cell[0]->num;
+    lval* true_path = lval_pop(a, 1);
+    lval* false_path = lval_pop(a, 1);
+    lval_del(a);
+
+    return condition ? 
+        lval_eval_sexpr(e, true_path) : 
+        lval_eval_sexpr(e, false_path);
 }
