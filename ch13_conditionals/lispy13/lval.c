@@ -69,6 +69,7 @@ lval* lval_qexpr() {
 #pragma endregion
 
 #pragma region helpers
+// TODO: refactor this -- it doesn't work if the user supplies too many arguments and there is no rest operator
 lval* lval_call(lenv* e, lval* f, lval* a) {
 /* Given a function, an lval with assignments, and an environment, call the function with those assignments in that environment.*/
 // This talk of "calling a function" is slightly misleading -- what we're really doing is generating a complete s-expression from the values given and the function schema, then evaluating the schema.  So if the function is {+ x y} and the values are (3, 4), we generate {+ 3 4} and evalute it, returning (7).    
