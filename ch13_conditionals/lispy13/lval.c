@@ -93,6 +93,12 @@ lval* lval_call(lenv* e, lval* f, lval* a) {
             lval_del(arg_list_param); 
             break;
         } else {
+            if (f->formals->cell_count + 1 != a->cell_count) 
+                return lval_err(
+                    "Too many arguments passed to anonymous function. Expected %i, got %i.",
+                    f->formals->cell_count + 1,
+                    a->cell_count
+                );
             // a->cell_count decreases by one
             lval* arg = lval_pop(a, 0);
             lenv_put(f->env, param, arg);
