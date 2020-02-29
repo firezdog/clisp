@@ -5,7 +5,8 @@ gcc \
   grammar.c \
   io.c \
   lispy.c \
-  lval.c \
+  lval/lval.c \
+  lval/lval_call.c \
   mpc_library/mpc.c \
   -leditline \
   -g

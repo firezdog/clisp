@@ -1,4 +1,5 @@
-#include "lispy.h"
+#include "../lispy.h"
+
 #define LVAL_STRCPY(x, v, field) \
     x->field = malloc(strlen(v->field) + 1); \
     strcpy(x->field, v->field);
@@ -69,68 +70,6 @@ lval* lval_qexpr() {
 #pragma endregion
 
 #pragma region helpers
-// TODO: refactor this -- it doesn't work if the user supplies too many arguments and there is no rest operator
-lval* lval_call(lenv* e, lval* f, lval* a) {
-/* Given a function, an lval with assignments, and an environment, call the function with those assignments in that environment.*/
-// This talk of "calling a function" is slightly misleading -- what we're really doing is generating a complete s-expression from the values given and the function schema, then evaluating the schema.  So if the function is {+ x y} and the values are (3, 4), we generate {+ 3 4} and evalute it, returning (7).    
-    if (f->builtin) { return f->builtin(e, a); }
-    // how many arguments are required and how many were supplied? -- used for error handling only
-    int args_required = f->formals->cell_count;
-    int args_supplied = a->cell_count;
-    // repeatedly evaluate function by applying arguments in order
-    while (a->cell_count) {
-        // case: the function is completely bound but there are still arguments in the queue
-        if (f->formals->cell_count == 0) {
-            lval_del(a);
-            return lval_err("Function passed too many arguments: got %s, expected %s", args_supplied, args_required);
-        }
-        lval* param = lval_pop(f->formals, 0);
-        // handle extra arguments -- not the symbol following and is the last symbol that can be defined
-        if (!strcmp(param->op, "&")) {
-            LASSERT(a, f->formals->cell_count == 1, "Function format invalid: '&' symbol must be followed by one argument naming the list of variable arguments");
-            lval* arg_list_param = lval_pop(f->formals, 0);
-            lenv_put(e, arg_list_param, builtin_list(e, a));
-            lval_del(arg_list_param); 
-            break;
-        } else {
-            if (f->formals->cell_count + 1 != a->cell_count) 
-                return lval_err(
-                    "Too many arguments passed to anonymous function. Expected %i, got %i.",
-                    f->formals->cell_count + 1,
-                    a->cell_count
-                );
-            // a->cell_count decreases by one
-            lval* arg = lval_pop(a, 0);
-            lenv_put(f->env, param, arg);
-            lval_del(arg);
-        }
-        lval_del(param);
-    }
-    lval_del(a);
-    // only evaluate if all formals have been bound
-    if (f->formals->cell_count > 0 && !strcmp(f->formals->cell[0]->op, "&")) {
-        lval_del(lval_pop(f->formals, 0));
-        LASSERT(NULL, f->formals->cell_count == 1,  "Function format invalid: '&' symbol must be followed by one argument naming the list of variable arguments");
-        lval* param = lval_pop(f->formals, 0);
-        // declare it so we can then cleanup below.
-        lval* arg = lval_qexpr();
-        lenv_put(f->env, param, arg);
-        lval_del(param); lval_del(arg);
-    }
-    f->env->parent_environment = e;
-    if (f->formals->cell_count == 0) {
-        // evaluate the function (an expression) using the variables in its environment and then parent environments
-        return builtin_eval(
-            f->env, 
-            lval_add(
-                lval_sexpr(), 
-                lval_copy(f->body)
-            )
-        );
-    }
-    return lval_copy(f);
-}
-
 // copy an lval.
 lval* lval_copy(lval* v) {
     lval* x = malloc(sizeof(lval));
