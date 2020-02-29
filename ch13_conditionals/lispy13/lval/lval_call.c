@@ -6,15 +6,11 @@ lval* lval_call(lenv* e, lval* f, lval* a) {
     int* args_required = &(f->formals->cell_count);
     int* args_supplied = &(a->cell_count);
     while (*args_supplied) {
-        int supplied = *args_supplied; int required = *args_required;
-        LASSERT(
-            a, 
-            required != 0, 
-            "Error: function doesn't take any arguments.", 
-            supplied, 
-            required
-        )
-        lval* param = lval_pop(f->formals, 0);
+        lval* dummy_param = lval_qexpr();
+        dummy_param->op = "NULL";
+        lval* param = *args_required == 0 ? 
+            dummy_param :
+            lval_pop(f->formals, 0);
         if (!strcmp(param->op, "&")) {
             LASSERT(
                 a, 
