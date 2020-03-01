@@ -40,3 +40,21 @@ Currently an exercise for the reader (and writer).
 
 ### JSON
 Currently an exercise for the reader (and writer).
+
+## Some Lisp Commands
+* function: define function:\
+(def {fun} (\ {signature body} {def (head signature) (\ (tail signature) body )}))
+* function: length of a list:\
+(fun {length given_list} {? (= given_list {}) {0} {+ 1 ( length (tail given_list) )} })
+* function: return nth element of a list:\
+(fun {nth_element n given_list} {? (< (- n 1) 1) (head given_list) {nth_element (- n 1) (tail given_list) }})
+* function: element x is in list:\
+(fun {in x given_list} { ? (= (len given_list) 0) {0} { ? (= (nth_element 1 given_list) x) {1} {in x (tail given_list)} } })
+* function: get last element of list:\
+( fun {get_last given_list} { ? (= (len given_list) 1) given_list {get_last (tail given_list)} } )
+* and\
+( fun {defined_and arg1 arg2} { ? (and arg1 arg2) {1} {0}})
+* or\
+( fun {defined_or arg1 arg2} { ? (or arg1 arg2) {1} {0}})
+* not\
+( fun {not arg1} { ? (! arg1) {1} {0}})
