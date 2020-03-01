@@ -58,3 +58,7 @@ Currently an exercise for the reader (and writer).
 ( fun {defined_or arg1 arg2} { ? (or arg1 arg2) {1} {0}})
 * not\
 ( fun {not arg1} { ? (! arg1) {1} {0}})
+* "and" defined with "not" and "or"\
+( fun {defined_and arg1 arg2} {not (or (not arg1) (not arg2))})
+* "or" defined with "not" and "and"\
+( fun {defined_or arg1 arg2} {not (and (not arg1) (not arg2))})
