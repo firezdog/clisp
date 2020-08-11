@@ -67,6 +67,13 @@ lval* lval_qexpr() {
     v->builtin = NULL;
     return v;
 }
+
+lval* lval_bool(truth_value_t truth_value) {
+    lval* v = malloc(sizeof(lval));
+    v->type = LVAL_BOOL;
+    v->truth_value = truth_value;
+    return v;
+}
 #pragma endregion
 
 #pragma region helpers

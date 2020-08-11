@@ -41,6 +41,7 @@ lval* eval_params(
 
         lval_del(param);
     }
+    return NULL;
 }
 
 lval* lval_call(lenv* e, lval* f, lval* a) {

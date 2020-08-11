@@ -11,3 +11,4 @@ gcc \
   lval/lval_call.c \
   mpc_library/mpc.c \
   -ledit \
+  -o lispy

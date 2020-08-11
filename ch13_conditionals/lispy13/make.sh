@@ -9,4 +9,5 @@ gcc \
   lval/lval_call.c \
   mpc_library/mpc.c \
   -leditline \
-  -g
+  -g \
+  -o lispy

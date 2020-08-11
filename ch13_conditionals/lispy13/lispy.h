@@ -59,6 +59,10 @@ void add_history(char* unused) {}
 #pragma endregion
 
 #pragma region lval
+enum {
+    LVAL_TRUE = 1,
+    LVAL_FALSE = 0,
+} typedef truth_value_t;
 enum { 
     LVAL_FN,
     LVAL_NUM, 
@@ -66,6 +70,7 @@ enum {
     LVAL_OP, 
     LVAL_QEXPR,
     LVAL_SEXPR, 
+    LVAL_BOOL,
     LERR_NUM, 
     LERR_OP, 
     LERR_DIV_ZERO };
@@ -79,6 +84,7 @@ struct lval {
     double num;
     char* err;
     char* op;
+    truth_value_t truth_value;
     
     /* function */
     lbuiltin builtin;
@@ -98,6 +104,7 @@ lval* lval_err(char* format, ...);
 lval* lval_op(char* op);
 lval* lval_sexpr();
 lval* lval_qexpr();
+lval* lval_bool(truth_value_t truth_value);
 lval* lval_copy(lval* v);
 lval* lval_add(lval* x, lval* v);
 void lval_del(lval* v);

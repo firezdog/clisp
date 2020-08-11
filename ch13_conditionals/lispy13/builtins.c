@@ -217,7 +217,7 @@ lval* name(lenv* e, lval* a)\
 TWO_PLACE_RELATION(builtin_greater, ">", >)
 TWO_PLACE_RELATION(builtin_lesser, "<", <)
 
-// TODO: apply to non-numbers?
+// TODO: apply to non-numbers? -- yes, will have to refactor to use LVAL_BOOL
 TWO_PLACE_RELATION(builtin_or, "or", ||);
 TWO_PLACE_RELATION(builtin_and, "and", &&);
 
@@ -226,15 +226,16 @@ TWO_PLACE_RELATION(builtin_and, "and", &&);
 lval* builtin_not(lenv* e, lval* a)
 {
     BUILTIN_ARG_CHECK(a, 1, "!", 1, a->cell_count);
+    // for robust boolean type, implement concept of truthiness
     BUILTIN_TYPE_CHECK(a, 0, "!", LVAL_NUM);
     lval* value = lval_pop(a, 0);
     double value_num = value->num;
     lval_del(a);
     lval_del(value);
     if (value_num == 0) {
-        return lval_num(1);
+        return lval_bool(LVAL_TRUE);
     }
-    return lval_num(0);
+    return lval_bool(LVAL_FALSE);
 }
 
 // strategy for equals: a == b if (1) they have the same type and (2) their fields are equal (recursion)
@@ -244,6 +245,7 @@ lval* builtin_equals(lenv* e, lval* a)
     BUILTIN_ARG_CHECK(a, 2, "=", 2, a->cell_count);
     lval* comp_a = lval_pop(a, 0);
     lval* comp_b = lval_pop(a, 0);
+    // needs to be changed to LVAL_BOOL
     lval* result = lval_num(lvals_equal(comp_a, comp_b));
     lval_del(comp_a); lval_del(comp_b);
     return result;

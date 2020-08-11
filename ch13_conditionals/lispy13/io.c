@@ -2,6 +2,10 @@
 
 void lval_print(lenv* e, lval* v) {
     switch(v->type) {
+        case(LVAL_BOOL)     :   
+            if (v->truth_value == LVAL_TRUE) printf("true");
+            else printf("false");
+            break;
         case(LVAL_NUM)      :   printf("%g", v->num);  break;
         case(LVAL_ERR)      :   printf("Error: %s", v->err); break;
         case(LVAL_OP)       :   printf("%s", v->op); break; 
@@ -18,7 +22,7 @@ void lval_print(lenv* e, lval* v) {
             }
             break;
         case(LVAL_SEXPR)    :   lval_sexpr_print(e, v, '(', ')'); break;
-        case(LVAL_QEXPR)    :   lval_sexpr_print(e, v, '{', '}'); break; 
+        case(LVAL_QEXPR)    :   lval_sexpr_print(e, v, '{', '}'); break;
     }
 }
 
