@@ -221,21 +221,17 @@ TWO_PLACE_RELATION(builtin_lesser, "<", <)
 TWO_PLACE_RELATION(builtin_or, "or", ||);
 TWO_PLACE_RELATION(builtin_and, "and", &&);
 
-// (not x) returns 1 iff x is 0 
-// TODO: how do you apply this to non-numerical expressions?
 lval* builtin_not(lenv* e, lval* a)
 {
     BUILTIN_ARG_CHECK(a, 1, "!", 1, a->cell_count);
-    // for robust boolean type, implement concept of truthiness
-    BUILTIN_TYPE_CHECK(a, 0, "!", LVAL_NUM);
-    lval* value = lval_pop(a, 0);
-    double value_num = value->num;
+    lval* evaluandum = lval_pop(a, 0);
+    lval* result = lval_bool(evaluandum);
+    result->truth_value = result->truth_value == LVAL_TRUE ?
+        LVAL_FALSE :
+        LVAL_TRUE;
+    lval_del(evaluandum);
     lval_del(a);
-    lval_del(value);
-    if (value_num == 0) {
-        return lval_bool(LVAL_TRUE);
-    }
-    return lval_bool(LVAL_FALSE);
+    return result;
 }
 
 // strategy for equals: a == b if (1) they have the same type and (2) their fields are equal (recursion)

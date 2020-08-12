@@ -68,10 +68,26 @@ lval* lval_qexpr() {
     return v;
 }
 
-lval* lval_bool(truth_value_t truth_value) {
+lval* lval_bool(lval* evaluandum) {
     lval* v = malloc(sizeof(lval));
     v->type = LVAL_BOOL;
-    v->truth_value = truth_value;
+    switch(evaluandum->type) {
+        // truthiness
+        case LVAL_FN:
+        case LVAL_OP:
+        case LVAL_ERR:
+            v->truth_value = LVAL_TRUE;
+            break;
+        case LVAL_NUM:
+            v->truth_value = evaluandum->num == 0 ? LVAL_FALSE : LVAL_TRUE;
+            break;
+        case LVAL_QEXPR:
+        case LVAL_SEXPR:    // in fact this could never be the value, because it would be evaluated?
+            v->truth_value = evaluandum->cell_count > 0 ? LVAL_TRUE : LVAL_FALSE;
+            break;
+        case LVAL_BOOL:
+            v->truth_value = evaluandum->truth_value;
+    }
     return v;
 }
 #pragma endregion
