@@ -198,7 +198,7 @@ lval* builtin_exit(lenv* e, lval* v) {
     return lval_sexpr();
 }
 
-# define TWO_PLACE_RELATION(name, symbol, operator)\
+# define TWO_PLACE_NUMERICAL_RELATION(name, symbol, operator)\
 lval* name(lenv* e, lval* a)\
 {\
     BUILTIN_ARG_CHECK(a, 2, symbol, 2, a->cell_count);\
@@ -210,16 +210,32 @@ lval* name(lenv* e, lval* a)\
     double comp_a_num = comp_a->num;\
     double comp_b_num = comp_b->num;\
     lval_del(comp_a); lval_del(comp_b);\
-    if (comp_a_num operator comp_b_num) return lval_num(1);\
-    return lval_num(0);\
+    if (comp_a_num operator comp_b_num) return lval_bool(lval_num(1));\
+    return lval_bool(lval_num(0));\
 }
 
-TWO_PLACE_RELATION(builtin_greater, ">", >)
-TWO_PLACE_RELATION(builtin_lesser, "<", <)
+#define TWO_PLACE_LOGICAL_RELATION(name, symbol, operator)\
+lval* name(lenv* e, lval* a)\
+{\
+    BUILTIN_ARG_CHECK(a, 2, symbol, 2, a->cell_count);\
+    BUILTIN_TYPE_CHECK(a, 0, symbol, LVAL_BOOL);\
+    BUILTIN_TYPE_CHECK(a, 1, symbol, LVAL_BOOL);\
+    lval* comp_a = lval_pop(a, 0);\
+    lval* comp_b = lval_pop(a, 0);\
+    lval_del(a);\
+    truth_value_t comp_a_num = comp_a->truth_value;\
+    truth_value_t comp_b_num = comp_b->truth_value;\
+    lval_del(comp_a); lval_del(comp_b);\
+    if (comp_a_num operator comp_b_num) return lval_bool(lval_num(1));\
+    return lval_bool(lval_num(0));\
+}
+
+TWO_PLACE_NUMERICAL_RELATION(builtin_greater, ">", >)
+TWO_PLACE_NUMERICAL_RELATION(builtin_lesser, "<", <)
 
 // TODO: apply to non-numbers? -- yes, will have to refactor to use LVAL_BOOL
-TWO_PLACE_RELATION(builtin_or, "or", ||);
-TWO_PLACE_RELATION(builtin_and, "and", &&);
+TWO_PLACE_LOGICAL_RELATION(builtin_or, "or", ||);
+TWO_PLACE_LOGICAL_RELATION(builtin_and, "and", &&);
 
 lval* builtin_not(lenv* e, lval* a)
 {
@@ -241,8 +257,7 @@ lval* builtin_equals(lenv* e, lval* a)
     BUILTIN_ARG_CHECK(a, 2, "=", 2, a->cell_count);
     lval* comp_a = lval_pop(a, 0);
     lval* comp_b = lval_pop(a, 0);
-    // needs to be changed to LVAL_BOOL
-    lval* result = lval_num(lvals_equal(comp_a, comp_b));
+    lval* result = lval_bool(lval_num(lvals_equal(comp_a, comp_b)));
     lval_del(comp_a); lval_del(comp_b);
     return result;
 }
@@ -253,6 +268,7 @@ int lvals_equal(lval* comp_a, lval* comp_b)
     
     switch (comp_a->type) 
     {
+        case LVAL_BOOL: return (comp_a->truth_value == comp_b->truth_value);
         case LVAL_NUM: return (comp_a->num == comp_b->num);
         case LVAL_ERR: return (!strcmp(comp_a->err, comp_b->err));
         // used for evaluating whether symbols in the body of an expression are the same
@@ -279,16 +295,18 @@ int lvals_equal(lval* comp_a, lval* comp_b)
 lval* builtin_ternary(lenv* e, lval* a)
 {
     BUILTIN_ARG_CHECK(a, 3, "?", 3, a->cell_count);
-    BUILTIN_TYPE_CHECK(a, 0, "?", LVAL_NUM);
     BUILTIN_TYPE_CHECK(a, 1, "?", LVAL_QEXPR);
-    BUILTIN_TYPE_CHECK(a, 1, "?", LVAL_QEXPR);
+    BUILTIN_TYPE_CHECK(a, 2, "?", LVAL_QEXPR);
     
-    double condition = a->cell[0]->num;
+    lval* condition = lval_bool(a->cell[0]);
+    truth_value_t condition_truth = condition->truth_value;
+    lval_del(condition);
+
     lval* true_path = lval_pop(a, 1);
     lval* false_path = lval_pop(a, 1);
     lval_del(a);
 
-    return condition ? 
+    return condition_truth ? 
         lval_eval_sexpr(e, true_path) : 
         lval_eval_sexpr(e, false_path);
 }
