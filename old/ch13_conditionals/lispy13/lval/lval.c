@@ -76,7 +76,7 @@ lval* lval_str(char* s) {
     return v;
 }
 
-lval* lval_bool(lval* evaluandum) {
+lval* lval_to_bool(lval* evaluandum) {
     lval* v = malloc(sizeof(lval));
     v->type = LVAL_BOOL;
     switch(evaluandum->type) {

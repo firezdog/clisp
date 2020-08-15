@@ -210,8 +210,8 @@ lval* name(lenv* e, lval* a)\
     double comp_a_num = comp_a->num;\
     double comp_b_num = comp_b->num;\
     lval_del(comp_a); lval_del(comp_b);\
-    if (comp_a_num operator comp_b_num) return lval_bool(lval_num(1));\
-    return lval_bool(lval_num(0));\
+    if (comp_a_num operator comp_b_num) return lval_to_bool(lval_num(1));\
+    return lval_to_bool(lval_num(0));\
 }
 
 #define TWO_PLACE_LOGICAL_RELATION(name, symbol, operator)\
@@ -226,8 +226,8 @@ lval* name(lenv* e, lval* a)\
     truth_value_t comp_a_num = comp_a->truth_value;\
     truth_value_t comp_b_num = comp_b->truth_value;\
     lval_del(comp_a); lval_del(comp_b);\
-    if (comp_a_num operator comp_b_num) return lval_bool(lval_num(1));\
-    return lval_bool(lval_num(0));\
+    if (comp_a_num operator comp_b_num) return lval_to_bool(lval_num(1));\
+    return lval_to_bool(lval_num(0));\
 }
 
 TWO_PLACE_NUMERICAL_RELATION(builtin_greater, ">", >)
@@ -241,7 +241,7 @@ lval* builtin_not(lenv* e, lval* a)
 {
     BUILTIN_ARG_CHECK(a, 1, "!", 1, a->cell_count);
     lval* evaluandum = lval_pop(a, 0);
-    lval* result = lval_bool(evaluandum);
+    lval* result = lval_to_bool(evaluandum);
     result->truth_value = result->truth_value == LVAL_TRUE ?
         LVAL_FALSE :
         LVAL_TRUE;
@@ -257,7 +257,7 @@ lval* builtin_equals(lenv* e, lval* a)
     BUILTIN_ARG_CHECK(a, 2, "=", 2, a->cell_count);
     lval* comp_a = lval_pop(a, 0);
     lval* comp_b = lval_pop(a, 0);
-    lval* result = lval_bool(lval_num(lvals_equal(comp_a, comp_b)));
+    lval* result = lval_to_bool(lval_num(lvals_equal(comp_a, comp_b)));
     lval_del(comp_a); lval_del(comp_b);
     return result;
 }
@@ -299,7 +299,7 @@ lval* builtin_ternary(lenv* e, lval* a)
     BUILTIN_TYPE_CHECK(a, 1, "?", LVAL_QEXPR);
     BUILTIN_TYPE_CHECK(a, 2, "?", LVAL_QEXPR);
     
-    lval* condition = lval_bool(a->cell[0]);
+    lval* condition = lval_to_bool(a->cell[0]);
     truth_value_t condition_truth = condition->truth_value;
     lval_del(condition);
 
