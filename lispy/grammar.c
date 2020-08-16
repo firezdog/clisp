@@ -1,24 +1,26 @@
 #include "lispy.h"
 
-void define_grammar(mpc_parser_t* Numeral, mpc_parser_t* Operator, mpc_parser_t* Sexpr, mpc_parser_t* Qexpr, mpc_parser_t* Expr, mpc_parser_t* Lispy) {
+void define_grammar(mpc_parser_t* Numeral, mpc_parser_t* String, mpc_parser_t* Operator, mpc_parser_t* Sexpr, mpc_parser_t* Qexpr, mpc_parser_t* Expr, mpc_parser_t* Lispy) {
     mpca_lang(MPCA_LANG_DEFAULT,
     "numeral: /-?([0-9]*\\.)?[0-9]+/ ;\
+    string: /\"(\\\\.|[^\"])*\"/ ;\
     operator: /[a-zA-Z0-9_+\\-*\\/\\\\=<>!&%?]+/ ;\
     sexpr: '(' <expr>* ')' ;\
     qexpr: '{' <expr>* '}' ;\
-    expr: <numeral> | <operator> | <sexpr> | <qexpr> ;\
+    expr: <numeral> | <operator> | <sexpr> | <qexpr> | <string> ;\
     lispy: /^/ <expr>* /$/ ;",
-    Numeral, Operator, Sexpr, Qexpr, Expr, Lispy);
+    Numeral, String, Operator, Sexpr, Qexpr, Expr, Lispy);
 }
 
 void init_grammar() {
     Numeral = mpc_new("numeral");
+    String = mpc_new("string");
     Operator = mpc_new("operator");
     Sexpr = mpc_new("sexpr");
     Qexpr = mpc_new("qexpr");
     Expr = mpc_new("expr");
     Lispy = mpc_new("lispy");
-    define_grammar(Numeral, Operator, Sexpr, Qexpr, Expr, Lispy);
+    define_grammar(Numeral, String, Operator, Sexpr, Qexpr, Expr, Lispy);
 }
 
 void parse(lenv* e) {
