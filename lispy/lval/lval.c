@@ -5,6 +5,12 @@
     strcpy(x->field, v->field);
 
 #pragma region constructors
+lval* lval_comment() {
+    lval* v = malloc(sizeof(lval));
+    v->type = LVAL_COMMENT;
+    return v;
+}
+
 lval* lval_fn(lbuiltin fn) {
     lval* v = malloc(sizeof(lval));
     v->type = LVAL_FN;

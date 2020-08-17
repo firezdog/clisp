@@ -2,6 +2,7 @@
 
 void lval_print(lenv* e, lval* v) {
     switch(v->type) {
+        case (LVAL_COMMENT): printf("OK"); break;
         case (LVAL_STR): lval_print_str(v); break;
         case(LVAL_BOOL):   
             if (v->truth_value == LVAL_TRUE) printf("true");
@@ -68,6 +69,7 @@ lval* lval_read_str(mpc_ast_t* t) {
 lval* lval_read(mpc_ast_t* t) {
     /* If operator (symbol) or numeral, convert to type
     (working at the level of expr in the grammar) */
+    if (strstr(t->tag, "comment")) return lval_comment();
     if (strstr(t->tag, "numeral")) return lval_read_num(t);
     if (strstr(t->tag, "string")) return lval_read_str(t);
     if (strstr(t->tag, "operator")) return lval_op(t->contents);
@@ -82,11 +84,12 @@ lval* lval_read(mpc_ast_t* t) {
             strcmp(t->children[i]->contents, ")") &&
             strcmp(t->children[i]->contents, "{") &&
             strcmp(t->children[i]->contents, "}") &&
-            strcmp(t->children[i]->tag, "regex")))
+            strcmp(t->children[i]->tag, "regex") &&
+            strcmp(t->children[i]->tag, "comment")))
             { continue; }
         x = lval_add(x, lval_read(t->children[i]));
     }
-    return x;
+    return x != NULL ? x : lval_sexpr();
 }
 
 // enum => name of enum
@@ -100,6 +103,7 @@ char* return_type(int t) {
         case(LVAL_OP): return "operator / symbol";
         case(LVAL_QEXPR): return "quoted expression";
         case(LVAL_SEXPR): return "expression";
+        case(LVAL_COMMENT): return "comment";
         default: return "unknown";
     }
 }
